@@ -3,56 +3,36 @@ import { computed, ref, watch, watchEffect } from 'vue';
 import axios from '@axios';
 import AddNewEmployeeDrawer from '@/views/employee/AddNewEmployeeDrawer.vue';
 import UpdateEmployeeDrawer from '@/views/employee/UpdateEmployeeDrawer.vue';
+import Skeleton from '@/views/skeleton/Skeleton.vue';
+import DeleteItemDialog from '@/@core/components/DeleteItemDialog.vue';
 
 const searchQuery = ref('');
 const rowPerPage = ref(10);
 const currentPage = ref(1);
 const totalPage = ref(1);
 const totalEmployees = ref(0);
-const candidates = ref([]);
+const employees = ref([]);
 const updateID = ref(0);
-
-const selectedState = ref('');
-const selectedGender = ref('');
-
-const states_list = ref([]);
-
 
 const lastFetchedPage = ref(null);
 const isFetching = ref(false);
-const filtersChanged = ref(false);
 
 const fetchEmployees = async (force = false) => {
-  if (
-    !force &&
-    (isFetching.value || (currentPage.value === lastFetchedPage.value && !filtersChanged.value))
-  ) {
+  if (!force && (isFetching.value || currentPage.value === lastFetchedPage.value)) {
     return; // Если запрос уже выполняется или страница не изменилась и фильтры не изменялись
   }
 
   isFetching.value = true;
-  let g = '';
-  let state = '';
-
-  if (selectedGender.value) {
-    g = '&gender=' + selectedGender.value;
-  }
-
-  if (selectedState.value) {
-    state = '&state=' + selectedState.value;
-  }
 
   try {
-    const candidates_r = await axios.get(`/candidates?page=${currentPage.value}${g}${state}`);
+    const employees_r = await axios.get(`/users?page=${currentPage.value}`);
 
-    candidates.value = candidates_r.data['candidates'];
+    employees.value = employees_r.data['users'];
     lastFetchedPage.value = currentPage.value; // Сохраняем последнюю загруженную страницу
-    currentPage.value = candidates_r.data['meta']['current_page'];
-    totalEmployees.value = candidates_r.data['meta']['total'];
-    totalPage.value = candidates_r.data['meta']['last_page'];
-    rowPerPage.value = candidates_r.data['meta']['per_page'];
-
-    filtersChanged.value = false; // Сбрасываем флаг изменений фильтров после загрузки
+    currentPage.value = employees_r.data['meta']['current_page'];
+    totalEmployees.value = employees_r.data['meta']['total'];
+    totalPage.value = employees_r.data['meta']['last_page'];
+    rowPerPage.value = employees_r.data['meta']['per_page'];
   } catch (e) {
     console.error('Ошибка загрузки кандидатов:', e);
   } finally {
@@ -67,35 +47,20 @@ watch(currentPage, () => {
   }
 });
 
-// 👉 watching selected filters
-watch([selectedState], () => {
-  // Сбрасываем на первую страницу при изменении фильтров
-  filtersChanged.value = true; // Устанавливаем флаг, что фильтры изменились
-  currentPage.value = 1;
-  fetchEmployees();
-});
-
 const searchEmployees = async () => {
-  const candidates_r = await axios.get('/candidates?search=' + searchQuery.value);
-  candidates.value = candidates_r.data['candidates'];
+  const employees_r = await axios.get('/users?search=' + searchQuery.value);
+  employees.value = employees_r.data['users'];
 
-  currentPage.value = candidates_r.data['meta']['current_page'];
-  totalEmployees.value = candidates_r.data['meta']['total'];
-  totalPage.value = candidates_r.data['meta']['last_page'];
-  rowPerPage.value = candidates_r.data['meta']['per_page'];
-};
-
-const fetchStates = async () => {
-  const states_r = await axios.get('/states');
-  states_list.value = states_r.data;
+  currentPage.value = employees_r.data['meta']['current_page'];
+  totalEmployees.value = employees_r.data['meta']['total'];
+  totalPage.value = employees_r.data['meta']['last_page'];
+  rowPerPage.value = employees_r.data['meta']['per_page'];
 };
 
 watchEffect(fetchEmployees);
 
-
 const isAddNewEmployeeDrawerVisible = ref(false);
 const isUpdateEmployeeDrawerVisible = ref(false);
-
 
 // Pages start
 
@@ -106,8 +71,8 @@ watchEffect(() => {
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = candidates.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0;
-  const lastIndex = candidates.value.length + (currentPage.value - 1) * rowPerPage.value;
+  const firstIndex = employees.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0;
+  const lastIndex = employees.value.length + (currentPage.value - 1) * rowPerPage.value;
 
   return `${firstIndex}-${lastIndex} of ${totalEmployees.value}`;
 });
@@ -115,36 +80,6 @@ const paginationData = computed(() => {
 // Pages end
 
 // New Employee
-
-const addNewEmployee = async (employeeData) => {
-  const {
-    full_name,
-    age,
-    languages,
-    positive_skills,
-    apps_text,
-    apps,
-    gender,
-    phone_number,
-    address,
-  } = employeeData;
-  try {
-    await axios.post('/candidates', {
-      full_name,
-      age,
-      languages: Array.from(languages),
-      positive_skills,
-      apps_text,
-      apps,
-      gender,
-      phone_number,
-      address,
-    });
-    await fetchEmployees(true);
-  } catch (e) {
-    console.error(e);
-  }
-};
 
 // Update Employee
 const updateEmployee = async ({
@@ -160,7 +95,7 @@ const updateEmployee = async ({
   address,
 }) => {
   try {
-    await axios.put(`/candidates/${id}`, {
+    await axios.put(`/users/${id}`, {
       full_name,
       age,
       apps_text,
@@ -184,8 +119,37 @@ const openEditDrawer = (id) => {
   isUpdateEmployeeDrawerVisible.value = true;
 };
 
+// Delete
 const isDialogVisible = ref(false);
+const isDeleting = ref(false)
+const roleData = ref({
+  id: 1,
+  name: null,
+});
 
+const confirmDelete = function (id, name) {
+  roleData.value.id = id;
+  roleData.value.name = name;
+  isDialogVisible.value = true;
+};
+
+const deleteItem = async function (id) {
+  try {
+    isDeleting.value=true
+    await axios.delete('/users/' + id);
+    await fetchEmployees(true);
+    isDialogVisible.value = false;
+  } catch (error) {
+    toast(error.response.data.message, {
+      theme: 'auto',
+      type: 'error',
+      dangerouslyHTMLString: true,
+    });
+  }finally{
+    isDeleting.value=false
+
+  }
+};
 </script>
 
 <template>
@@ -193,10 +157,17 @@ const isDialogVisible = ref(false);
     <VRow>
       <VCol cols="12">
         <VCard title="Search Filters">
-            
-            <VCardText class="d-flex flex-wrap">
-              <VSpacer />
-           
+          <DeleteItemDialog
+            @confirm="deleteItem"
+            :isDialogVisible="isDialogVisible"
+            @update:isDialogVisible="isDialogVisible = $event"
+            :role="roleData"
+            :isDeleting="isDeleting"
+          />
+
+          <VCardText class="d-flex flex-wrap">
+            <VSpacer />
+
             <VCol cols="6" class="app-user-search-filter d-flex align-center">
               <VTextField
                 v-model="searchQuery"
@@ -205,9 +176,8 @@ const isDialogVisible = ref(false);
                 density="compact"
                 class="me-6"
               />
-              <VBtn @click="isAddNewEmployeeDrawerVisible = true" > Add new Employee </VBtn>
+              <VBtn @click="isAddNewEmployeeDrawerVisible = true"> Add new Employee </VBtn>
             </VCol>
-
           </VCardText>
 
           <VDivider />
@@ -217,40 +187,41 @@ const isDialogVisible = ref(false);
               <tr>
                 <th style="width: 48px">ID</th>
                 <th>FULL NAME</th>
-                <th>AGE</th>
-                <th>PHONE NUMBER</th>
+                <th>LOGIN</th>
                 <th>ACTIONS</th>
               </tr>
             </thead>
 
             <tbody>
-              <tr
-                v-for="candidate in candidates"
-                :key="candidate.id"
-                @click="handle2(candidate.id)"
-              >
-                <td>{{ candidate.id }}</td>
-                <td>{{ candidate.full_name }}</td>
-                <td>{{ candidate.age }}</td>
-                <td>{{ candidate.phone_number }}</td>
+              <tr v-for="(employee, i) in employees" :key="i">
+                <td>{{ i + 1 }}</td>
+                <td>{{ employee.name }}</td>
+                <td>{{ employee.login }}</td>
                 <td class="text-center" style="width: 80px">
                   <VIcon
                     @click="
                       (event) => {
                         event.stopPropagation();
-                        openEditDrawer(candidate.id);
+                        openEditDrawer(employee.id);
                       }
                     "
                     size="30"
                     icon="bx-edit-alt"
                     style="color: rgb(var(--v-global-theme-primary))"
                   ></VIcon>
-
+                  <VIcon
+                    size="30"
+                    icon="bx-trash"
+                    style="color: red"
+                    @click="confirmDelete(employee.id, employee.name)"
+                  ></VIcon>
                 </td>
               </tr>
             </tbody>
 
-            <tfoot v-show="!candidates.length">
+            <Skeleton :count="4" v-if="isFetching && !employees.length" />
+
+            <tfoot v-show="!isFetching && !employees.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">No data available</td>
               </tr>
@@ -265,7 +236,7 @@ const isDialogVisible = ref(false);
             </div>
 
             <VPagination
-              v-if="candidates.length"
+              v-if="employees.length"
               v-model="currentPage"
               size="small"
               :total-visible="1"
@@ -278,12 +249,12 @@ const isDialogVisible = ref(false);
 
     <AddNewEmployeeDrawer
       v-model:isDrawerOpen="isAddNewEmployeeDrawerVisible"
-      @candidateData="addNewEmployee"
+      @fetchEmployees="() => fetchEmployees(true)"
     />
     <UpdateEmployeeDrawer
       :id="updateID"
       v-model:isDrawerOpen="isUpdateEmployeeDrawerVisible"
-      @candidateData="updateEmployee"
+      @employeeData="updateEmployee"
     />
   </section>
 </template>

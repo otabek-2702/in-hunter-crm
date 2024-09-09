@@ -7,6 +7,7 @@ import { loadFonts } from '@/plugins/webfontloader'
 import router from '@/router'
 import '@core/scss/template/index.scss'
 import '@styles/styles.scss'
+import "vue3-toastify/dist/index.css";
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import { abilitiesPlugin } from "@casl/vue"

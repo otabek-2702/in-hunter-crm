@@ -10,6 +10,7 @@ import Tables from "@/pages/tables.vue";
 import DefaultLayoutWithVerticalNav from '@/layouts/default.vue';
 import ability from "@/plugins/casl/ability";
 import Forbidden from "@/pages/forbidden.vue";
+import Employees from '@/pages/employees.vue'
 
 
 const router = createRouter({
@@ -67,7 +68,7 @@ const router = createRouter({
         {
           path: 'employees',
           name: 'Employees',
-          component: () => import("@/pages/employees.vue"),
+          component: Employees,
           meta: {
             action: 'show',
             subject:'Employees',
