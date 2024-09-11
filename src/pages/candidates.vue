@@ -4,6 +4,7 @@ import axios from '@axios';
 import AddNewCandidateDrawer from '@/views/candidate/AddNewCandidateDrawer.vue';
 import UpdateCandidateDrawer from '@/views/candidate/UpdateCandidateDrawer.vue';
 import ChangeStateCandidate from '@core/demo/ChangeStateCandidate.vue';
+import Skeleton from '@/views/skeleton/Skeleton.vue';
 
 const searchQuery = ref('');
 const rowPerPage = ref(10);
@@ -33,6 +34,7 @@ const isFetching = ref(false);
 const filtersChanged = ref(false);
 
 const fetchCandidates = async (force = false) => {
+  isFetching.value =true
   if (
     !force &&
     (isFetching.value || (currentPage.value === lastFetchedPage.value && !filtersChanged.value))
@@ -97,7 +99,7 @@ const searchCandidates = async () => {
 
 const fetchStates = async () => {
   const states_r = await axios.get('/states');
-  states_list.value = states_r.data;
+  states_list.value = states_r.data.states.filter(el => el.table === "candidates");
 };
 
 watchEffect(fetchCandidates);
@@ -118,10 +120,7 @@ const resolveUserRoleVariant = (state) => {
 
 const isAddNewCandidateDrawerVisible = ref(false);
 const isUpdateCandidateDrawerVisible = ref(false);
-const roleData = ref({
-  id: 1,
-  name: null,
-});
+
 
 // 👉 Watching current page
 watchEffect(() => {
@@ -203,9 +202,7 @@ const openEditDrawer = (id) => {
 };
 
 const isDialogVisible = ref(false);
-const handle2 = (id) => {
-  alert(id);
-};
+
 </script>
 
 <template>
@@ -272,7 +269,7 @@ const handle2 = (id) => {
               </tr>
             </thead>
 
-            <tbody>
+            <tbody v-show="candidates.length">
               <tr
                 v-for="candidate in candidates"
                 :key="candidate.id"
@@ -310,6 +307,7 @@ const handle2 = (id) => {
                 </td>
               </tr>
             </tbody>
+            <Skeleton :count="7" v-if="isFetching" />
 
             <tfoot v-show="!candidates.length">
               <tr>

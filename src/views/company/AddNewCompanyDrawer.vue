@@ -1,7 +1,7 @@
 <script setup>
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar';
 import { requiredValidator } from '@validators';
-import { nextTick, ref, watch, watchEffect } from 'vue';
+import { nextTick, ref, watchEffect } from 'vue';
 import AppDrawerHeaderSection from '@core/components/AppDrawerHeaderSection.vue';
 import axios from '@axios';
 import { toast } from 'vue3-toastify';
@@ -11,15 +11,13 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
-
-  id: {
-    required: true,
-  },
 });
 
-const emit = defineEmits(['update:isDrawerOpen', 'fetchEmployees']);
+const emit = defineEmits(['update:isDrawerOpen', 'fetchDatas']);
+
 const isFetching = ref(false);
 const isFormValid = ref(false);
+const isValidLogin = ref(true);
 const refForm = ref();
 const roles_list = ref([]);
 const name = ref('');
@@ -29,36 +27,28 @@ const role_id = ref('');
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
-  emit('update:isDrawerOpen', false);
   nextTick(() => {
+    emit('update:isDrawerOpen', false);
     refForm.value?.reset();
     refForm.value?.resetValidation();
   });
 };
+
 const onSubmit = () => {
+  isFetching.value = true;
   refForm.value?.validate().then(async ({ valid }) => {
     if (valid) {
-      isFetching.value = true;
       try {
-        let body = {
+        const response = await axios.post('/users', {
           name: name.value,
           login: login.value,
+          password: password.value,
           role_id: role_id.value,
-        };
-        if (password.value) {
-          body.password = password.value;
-        }
+        });
 
-        const response = await axios.patch(`/users/${props.id}`, body);
+        if (response.status == 201) {
+          emit('fetchDatas');
 
-        if (response.status == 200) {
-          emit('fetchEmployees');
-
-          toast('Успешно', {
-            theme: 'auto',
-            type: 'success',
-            dangerouslyHTMLString: true,
-          });
           closeNavigationDrawer();
         }
       } catch (error) {
@@ -75,36 +65,18 @@ const onSubmit = () => {
             dangerouslyHTMLString: true,
           });
         }
-      } finally {
-        isFetching.value = false;
-      }
+        isValidLogin.value = false;
+      } 
     }
   });
+  isFetching.value = false;
 };
+
+watchEffect(login, () => (isValidLogin.value = true));
 
 const handleDrawerModelValueUpdate = (val) => {
   emit('update:isDrawerOpen', val);
 };
-
-const fetchUser = async () => {
-  try {
-    const user = await axios.get(`/users/${props.id}`);
-    name.value = user.data.name;
-    login.value = user.data.login;
-    role_id.value = user.data.role.id;
-  } catch (error) {
-    toast(error.response.data.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
-  }
-};
-
-watch(
-  () => props.isDrawerOpen,
-  (newVal) => newVal && fetchUser(),
-);
 
 const fetchRoles = async function () {
   const r = await axios.get('/roles');
@@ -125,7 +97,7 @@ watchEffect(fetchRoles);
     @update:model-value="handleDrawerModelValueUpdate"
   >
     <!-- 👉 Title -->
-    <AppDrawerHeaderSection title="Update Employee" @cancel="closeNavigationDrawer" />
+    <AppDrawerHeaderSection title="Add Employee" @cancel="closeNavigationDrawer" />
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
@@ -140,21 +112,26 @@ watchEffect(fetchRoles);
           >
             <VRow>
               <VCol cols="12">
-                <VTextField v-model="name" label="Name" />
+                <VTextField v-model="name" :rules="[requiredValidator]" label="Name" />
               </VCol>
 
               <VCol cols="12">
-                <VTextField v-model="login" label="Login" />
+                <VTextField
+                  v-model="login"
+                  :rules="[requiredValidator, () => isValidLogin]"
+                  label="Login"
+                />
               </VCol>
 
               <VCol cols="12">
-                <VTextField v-model="password" label="Password" />
+                <VTextField v-model="password" :rules="[requiredValidator]" label="Password" />
               </VCol>
               <VCol cols="12">
                 <VSelect
                   persistent-hint
                   v-model="role_id"
                   label="Select role"
+                  :rules="[requiredValidator]"
                   :items="roles_list"
                   item-title="name_ru"
                   item-value="id"

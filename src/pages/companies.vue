@@ -1,8 +1,8 @@
 <script setup>
 import { computed, ref, watch, watchEffect } from 'vue';
 import axios from '@axios';
-import AddNewEmployeeDrawer from '@/views/employee/AddNewEmployeeDrawer.vue';
-import UpdateEmployeeDrawer from '@/views/employee/UpdateEmployeeDrawer.vue';
+import AddNewCompanyDrawer from '@/views/company/AddNewCompanyDrawer.vue';
+import UpdateCompanyDrawer from '@/views/company/UpdateCompanyDrawer.vue';
 import Skeleton from '@/views/skeleton/Skeleton.vue';
 import DeleteItemDialog from '@/@core/components/DeleteItemDialog.vue';
 
@@ -11,13 +11,13 @@ const rowPerPage = ref(10);
 const currentPage = ref(1);
 const totalPage = ref(1);
 const totalEmployees = ref(0);
-const employees = ref([]);
+const companies = ref([]);
 const updateID = ref(0);
 
 const lastFetchedPage = ref(null);
 const isFetching = ref(false);
 
-const fetchEmployees = async (force = false) => {
+const fetchData = async (force = false) => {
   if (!force && (isFetching.value || currentPage.value === lastFetchedPage.value)) {
     return; // Если запрос уже выполняется или страница не изменилась и фильтры не изменялись
   }
@@ -25,14 +25,14 @@ const fetchEmployees = async (force = false) => {
   isFetching.value = true;
 
   try {
-    const employees_r = await axios.get(`/users?page=${currentPage.value}`);
+    const companies_r = await axios.get(`/companies?page=${currentPage.value}`);
 
-    employees.value = employees_r.data['users'];
+    companies.value = companies_r.data['companies'];
     lastFetchedPage.value = currentPage.value; // Сохраняем последнюю загруженную страницу
-    currentPage.value = employees_r.data['meta']['current_page'];
-    totalEmployees.value = employees_r.data['meta']['total'];
-    totalPage.value = employees_r.data['meta']['last_page'];
-    rowPerPage.value = employees_r.data['meta']['per_page'];
+    currentPage.value = companies_r.data['meta']['current_page'];
+    totalEmployees.value = companies_r.data['meta']['total'];
+    totalPage.value = companies_r.data['meta']['last_page'];
+    rowPerPage.value = companies_r.data['meta']['per_page'];
   } catch (e) {
     console.error('Ошибка загрузки кандидатов:', e);
   } finally {
@@ -43,24 +43,24 @@ const fetchEmployees = async (force = false) => {
 // 👉 watching current page
 watch(currentPage, () => {
   if (!isFetching.value) {
-    fetchEmployees();
+    fetchData();
   }
 });
 
 const searchEmployees = async () => {
-  const employees_r = await axios.get('/users?search=' + searchQuery.value);
-  employees.value = employees_r.data['users'];
+  const companies_r = await axios.get('/companies?search=' + searchQuery.value);
+  companies.value = companies_r.data['companies'];
 
-  currentPage.value = employees_r.data['meta']['current_page'];
-  totalEmployees.value = employees_r.data['meta']['total'];
-  totalPage.value = employees_r.data['meta']['last_page'];
-  rowPerPage.value = employees_r.data['meta']['per_page'];
+  currentPage.value = companies_r.data['meta']['current_page'];
+  totalEmployees.value = companies_r.data['meta']['total'];
+  totalPage.value = companies_r.data['meta']['last_page'];
+  rowPerPage.value = companies_r.data['meta']['per_page'];
 };
 
-watchEffect(fetchEmployees);
+watchEffect(fetchData);
 
-const isAddNewEmployeeDrawerVisible = ref(false);
-const isUpdateEmployeeDrawerVisible = ref(false);
+const isAddNewCompanyDrawerVisible = ref(false);
+const isUpdateCompanyDrawerVisible = ref(false);
 
 // Pages start
 
@@ -71,39 +71,38 @@ watchEffect(() => {
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = employees.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0;
-  const lastIndex = employees.value.length + (currentPage.value - 1) * rowPerPage.value;
+  const firstIndex = companies.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0;
+  const lastIndex = companies.value.length + (currentPage.value - 1) * rowPerPage.value;
 
   return `${firstIndex}-${lastIndex} of ${totalEmployees.value}`;
 });
 
 // Pages end
 
-
 const openEditDrawer = (id) => {
   updateID.value = id;
-  isUpdateEmployeeDrawerVisible.value = true;
+  isUpdateCompanyDrawerVisible.value = true;
 };
 
 // Delete
 const isDialogVisible = ref(false);
-const isDeleting = ref(false)
-const roleData = ref({
+const isDeleting = ref(false);
+const deleteData = ref({
   id: 1,
   name: null,
 });
 
 const confirmDelete = function (id, name) {
-  roleData.value.id = id;
-  roleData.value.name = name;
+  deleteData.value.id = id;
+  deleteData.value.name = name;
   isDialogVisible.value = true;
 };
 
 const deleteItem = async function (id) {
   try {
-    isDeleting.value=true
-    await axios.delete('/users/' + id);
-    await fetchEmployees(true);
+    isDeleting.value = true;
+    await axios.delete('/companies/' + id);
+    await fetchData(true);
     isDialogVisible.value = false;
   } catch (error) {
     toast(error.response.data.message, {
@@ -111,9 +110,8 @@ const deleteItem = async function (id) {
       type: 'error',
       dangerouslyHTMLString: true,
     });
-  }finally{
-    isDeleting.value=false
-
+  } finally {
+    isDeleting.value = false;
   }
 };
 </script>
@@ -127,7 +125,7 @@ const deleteItem = async function (id) {
             @confirm="deleteItem"
             :isDialogVisible="isDialogVisible"
             @update:isDialogVisible="isDialogVisible = $event"
-            :role="roleData"
+            :role="deleteData"
             :isDeleting="isDeleting"
           />
 
@@ -152,23 +150,23 @@ const deleteItem = async function (id) {
             <thead>
               <tr>
                 <th style="width: 48px">ID</th>
-                <th>FULL NAME</th>
-                <th>LOGIN</th>
+                <th>NAME</th>
+                <th>PHONE</th>
                 <th>ACTIONS</th>
               </tr>
             </thead>
 
             <tbody>
-              <tr v-for="(employee, i) in employees" :key="i">
+              <tr v-for="(company, i) in companies" :key="i">
                 <td>{{ i + 1 }}</td>
-                <td>{{ employee.name }}</td>
-                <td>{{ employee.login }}</td>
+                <td>{{ company.title }}</td>
+                <td>{{ company.phone_number }}</td>
                 <td class="text-center" style="width: 80px">
                   <VIcon
                     @click="
                       (event) => {
                         event.stopPropagation();
-                        openEditDrawer(employee.id);
+                        openEditDrawer(company.id);
                       }
                     "
                     size="30"
@@ -179,15 +177,15 @@ const deleteItem = async function (id) {
                     size="30"
                     icon="bx-trash"
                     style="color: red"
-                    @click="confirmDelete(employee.id, employee.name)"
+                    @click="confirmDelete(company.id, company.title)"
                   ></VIcon>
                 </td>
               </tr>
             </tbody>
 
-            <Skeleton :count="4" v-if="isFetching && !employees.length" />
+            <Skeleton :count="4" v-if="isFetching && !companies.length" />
 
-            <tfoot v-show="!isFetching && !employees.length">
+            <tfoot v-show="!isFetching && !companies.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">No data available</td>
               </tr>
@@ -202,7 +200,7 @@ const deleteItem = async function (id) {
             </div>
 
             <VPagination
-              v-if="employees.length"
+              v-if="companies.length"
               v-model="currentPage"
               size="small"
               :total-visible="1"
@@ -213,14 +211,14 @@ const deleteItem = async function (id) {
       </VCol>
     </VRow>
 
-    <AddNewEmployeeDrawer
-      v-model:isDrawerOpen="isAddNewEmployeeDrawerVisible"
-      @fetchEmployees="() => fetchEmployees(true)"
+    <AddNewCompanyDrawer
+      v-model:isDrawerOpen="isAddNewCompanyDrawerVisible"
+      @fetchDatas="() =>fetchData(true)"
     />
-    <UpdateEmployeeDrawer
+    <UpdateCompanyDrawer
       :id="updateID"
-      v-model:isDrawerOpen="isUpdateEmployeeDrawerVisible"
-      @fetchEmployees="() => fetchEmployees(true)"
+      v-model:isDrawerOpen="isUpdateCompanyDrawerVisible"
+      @fetchDatas="() =>fetchData(true)"
     />
   </section>
 </template>

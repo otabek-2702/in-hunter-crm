@@ -47,7 +47,6 @@ const onNextState = () => {
 
     <!-- Dialog Content -->
     <VCard title="User Profile">
-      {{props.id || 's'}}
       <DialogCloseBtn variant="text" size="small" @click="isDialogVisible = false" />
 
       <VCardText>

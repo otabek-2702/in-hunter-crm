@@ -1,10 +1,10 @@
 <script setup>
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar';
-import { requiredValidator } from '@validators';
-import { nextTick, ref, watch, watchEffect } from 'vue';
+import { nextTick, ref, watch } from 'vue';
 import AppDrawerHeaderSection from '@core/components/AppDrawerHeaderSection.vue';
 import axios from '@axios';
 import { toast } from 'vue3-toastify';
+import { VOverlay, VProgressCircular } from 'vuetify/components';
 
 const props = defineProps({
   isDrawerOpen: {
@@ -17,15 +17,14 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:isDrawerOpen', 'fetchEmployees']);
+const emit = defineEmits(['update:isDrawerOpen','fetchDatas']);
 const isFetching = ref(false);
+const isFetchingStart = ref(true);
 const isFormValid = ref(false);
 const refForm = ref();
-const roles_list = ref([]);
-const name = ref('');
-const login = ref('');
-const password = ref('');
-const role_id = ref('');
+const title = ref('');
+const phone_number = ref('');
+const description = ref('');
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -36,45 +35,29 @@ const closeNavigationDrawer = () => {
   });
 };
 const onSubmit = () => {
+  console.log(isFetching.value)
   refForm.value?.validate().then(async ({ valid }) => {
     if (valid) {
       isFetching.value = true;
       try {
         let body = {
-          name: name.value,
-          login: login.value,
-          role_id: role_id.value,
+          title: title.value,
+          phone_number: phone_number.value,
+          description: description.value,
         };
-        if (password.value) {
-          body.password = password.value;
-        }
 
-        const response = await axios.patch(`/users/${props.id}`, body);
-
+        const response = await axios.patch(`/companies/${props.id}`, body);
         if (response.status == 200) {
-          emit('fetchEmployees');
+          emit('fetchDatas');
 
-          toast('Успешно', {
-            theme: 'auto',
-            type: 'success',
-            dangerouslyHTMLString: true,
-          });
           closeNavigationDrawer();
         }
       } catch (error) {
-        if (error.response.data.message == 'The login has already been taken.') {
-          toast('Ushbu login bant.', {
-            theme: 'auto',
-            type: 'error',
-            dangerouslyHTMLString: true,
-          });
-        } else {
-          toast(error.response.data.message, {
-            theme: 'auto',
-            type: 'error',
-            dangerouslyHTMLString: true,
-          });
-        }
+        toast(error.response.data.message, {
+          theme: 'auto',
+          type: 'error',
+          dangerouslyHTMLString: true,
+        });
       } finally {
         isFetching.value = false;
       }
@@ -86,33 +69,28 @@ const handleDrawerModelValueUpdate = (val) => {
   emit('update:isDrawerOpen', val);
 };
 
-const fetchUser = async () => {
+const fetchDataById = async () => {
+  isFetchingStart.value = true;
   try {
-    const user = await axios.get(`/users/${props.id}`);
-    name.value = user.data.name;
-    login.value = user.data.login;
-    role_id.value = user.data.role.id;
+    const { data } = await axios.get(`/companies/${props.id}`);
+    title.value = data.title;
+    phone_number.value = data.phone_number;
+    description.value = data.description;
   } catch (error) {
-    toast(error.response.data.message, {
+    toast(error?.response?.data?.message, {
       theme: 'auto',
       type: 'error',
       dangerouslyHTMLString: true,
     });
+  } finally {
+    isFetchingStart.value = false;
   }
 };
 
 watch(
   () => props.isDrawerOpen,
-  (newVal) => newVal && fetchUser(),
+  (newVal) => newVal && fetchDataById(),
 );
-
-const fetchRoles = async function () {
-  const r = await axios.get('/roles');
-  r.data.roles.shift();
-  roles_list.value = r.data.roles;
-};
-
-watchEffect(fetchRoles);
 </script>
 
 <template>
@@ -137,28 +115,19 @@ watchEffect(fetchRoles);
             v-model="isFormValid"
             @submit.prevent="onSubmit"
             :disabled="isFetching"
+            v-if="!isFetchingStart"
           >
             <VRow>
               <VCol cols="12">
-                <VTextField v-model="name" label="Name" />
+                <VTextField v-model="title" label="Title" />
               </VCol>
 
               <VCol cols="12">
-                <VTextField v-model="login" label="Login" />
+                <VTextField v-model="phone_number" label="Phone number" />
               </VCol>
 
               <VCol cols="12">
-                <VTextField v-model="password" label="Password" />
-              </VCol>
-              <VCol cols="12">
-                <VSelect
-                  persistent-hint
-                  v-model="role_id"
-                  label="Select role"
-                  :items="roles_list"
-                  item-title="name_ru"
-                  item-value="id"
-                />
+                <VTextarea v-model="description" label="Description" />
               </VCol>
 
               <!-- 👉 Submit and Cancel -->
@@ -172,6 +141,10 @@ watchEffect(fetchRoles);
               </VCol>
             </VRow>
           </VForm>
+
+          <div v-if="isFetchingStart" class="d-flex h-screen align-center justify-center">
+            <VProgressCircular color="primary" indeterminate></VProgressCircular>
+          </div>
         </VCardText>
       </VCard>
     </PerfectScrollbar>
