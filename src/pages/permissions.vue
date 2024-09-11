@@ -3,7 +3,7 @@ import {computed, nextTick, ref, watch, watchEffect} from "vue";
 import axios from "@axios";
 import AddNewPermissionDrawer from "@/views/permission/list/AddNewPermissionDrawer.vue";
 import EditPermissionDrawer from "@/views/permission/edit/EditPermissionDrawer.vue";
-// import MoreBtnPermission from "@/@core/components/Permission/MoreBtnPermission.vue";
+// import MoreBtnPermission from "@/@core/components/Permission/MoreBtnPermission.vue"; 
 
 const searchQuery = ref('')
 const permissions = ref('')
