@@ -11,6 +11,8 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  companies_list: { type: Array, required: true },
+  job_positions_list: { type: Array, required: true },
 });
 
 const emit = defineEmits(['update:isDrawerOpen', 'fetchDatas']);
@@ -19,11 +21,11 @@ const isFetching = ref(false);
 const isFormValid = ref(false);
 const isValidLogin = ref(true);
 const refForm = ref();
-const roles_list = ref([]);
-const name = ref('');
-const login = ref('');
-const password = ref('');
-const role_id = ref('');
+// const companies_list = ref([]);
+const company_id = ref('');
+const job_position_id = ref('');
+const quantity = ref('');
+const description = ref('');
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -35,18 +37,18 @@ const closeNavigationDrawer = () => {
 };
 
 const onSubmit = () => {
-  isFetching.value = true;
   refForm.value?.validate().then(async ({ valid }) => {
     if (valid) {
+      isFetching.value = true;
       try {
-        const response = await axios.post('/users', {
-          name: name.value,
-          login: login.value,
-          password: password.value,
-          role_id: role_id.value,
+        const response = await axios.post('/vacancies', {
+          company_id: company_id.value,
+          job_position_id: job_position_id.value,
+          quantity: quantity.value,
+          description: description.value,
         });
 
-        if (response.status == 201) {
+        if (response.status == 200) {
           emit('fetchDatas');
 
           closeNavigationDrawer();
@@ -65,25 +67,16 @@ const onSubmit = () => {
             dangerouslyHTMLString: true,
           });
         }
-        isValidLogin.value = false;
-      } 
+      } finally {
+        isFetching.value = false;
+      }
     }
   });
-  isFetching.value = false;
 };
-
 
 const handleDrawerModelValueUpdate = (val) => {
   emit('update:isDrawerOpen', val);
 };
-
-const fetchRoles = async function () {
-  const r = await axios.get('/roles');
-  r.data.roles.shift();
-  roles_list.value = r.data.roles;
-};
-
-watchEffect(fetchRoles);
 </script>
 
 <template>
@@ -96,7 +89,7 @@ watchEffect(fetchRoles);
     @update:model-value="handleDrawerModelValueUpdate"
   >
     <!-- 👉 Title -->
-    <AppDrawerHeaderSection title="Add Employee" @cancel="closeNavigationDrawer" />
+    <AppDrawerHeaderSection title="Добавить новую вакансию" @cancel="closeNavigationDrawer" />
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
@@ -111,30 +104,34 @@ watchEffect(fetchRoles);
           >
             <VRow>
               <VCol cols="12">
-                <VTextField v-model="name" :rules="[requiredValidator]" label="Name" />
-              </VCol>
-
-              <VCol cols="12">
-                <VTextField
-                  v-model="login"
-                  :rules="[requiredValidator, () => isValidLogin]"
-                  label="Login"
+                <VSelect
+                  v-model="company_id"
+                  label="Select Company"
+                  :items="props.companies_list"
+                  item-title="title"
+                  item-value="id"
+                  clearable
+                  clear-icon="bx-x"
                 />
               </VCol>
 
-              <VCol cols="12">
-                <VTextField v-model="password" :rules="[requiredValidator]" label="Password" />
-              </VCol>
               <VCol cols="12">
                 <VSelect
-                  persistent-hint
-                  v-model="role_id"
-                  label="Select role"
-                  :rules="[requiredValidator]"
-                  :items="roles_list"
+                  v-model="job_position_id"
+                  label="Select Job"
+                  :items="props.job_positions_list"
                   item-title="name_ru"
                   item-value="id"
+                  clearable
+                  clear-icon="bx-x"
                 />
+              </VCol>
+
+              <VCol cols="12">
+                <VTextField v-model="quantity" label="Count" type="number" />
+              </VCol>
+              <VCol cols="12">
+                <VTextarea v-model="description" label="Description" />
               </VCol>
 
               <!-- 👉 Submit and Cancel -->

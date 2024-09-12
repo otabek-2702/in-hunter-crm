@@ -72,7 +72,6 @@ const onSubmit = () => {
   isFetching.value = false;
 };
 
-watchEffect(login, () => (isValidLogin.value = true));
 
 const handleDrawerModelValueUpdate = (val) => {
   emit('update:isDrawerOpen', val);

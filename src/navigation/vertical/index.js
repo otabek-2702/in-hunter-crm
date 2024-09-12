@@ -34,6 +34,13 @@ export default [
     subject: 'Companies',
     action: 'show'
   },
+  {
+    title: 'Vacancies',
+    to: { name: 'Vacancies' },
+    icon: { icon: 'mdi-file-account-outline' },
+    subject: 'Vacancies',
+    action: 'show'
+  },
 ]
 
 

@@ -1,89 +1,96 @@
 <script setup>
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar';
-import { requiredValidator } from '@validators';
-import { nextTick, ref, watchEffect } from 'vue';
+import { nextTick, ref, watch } from 'vue';
 import AppDrawerHeaderSection from '@core/components/AppDrawerHeaderSection.vue';
 import axios from '@axios';
 import { toast } from 'vue3-toastify';
+import { VOverlay, VProgressCircular } from 'vuetify/components';
 
 const props = defineProps({
   isDrawerOpen: {
     type: Boolean,
     required: true,
   },
+
+  id: {
+    required: true,
+  },
 });
 
-const emit = defineEmits(['update:isDrawerOpen', 'fetchDatas']);
-
+const emit = defineEmits(['update:isDrawerOpen','fetchDatas']);
 const isFetching = ref(false);
+const isFetchingStart = ref(true);
 const isFormValid = ref(false);
-const isValidLogin = ref(true);
 const refForm = ref();
-const roles_list = ref([]);
-const name = ref('');
-const login = ref('');
-const password = ref('');
-const role_id = ref('');
+const title = ref('');
+const phone_number = ref('');
+const description = ref('');
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
+  emit('update:isDrawerOpen', false);
   nextTick(() => {
-    emit('update:isDrawerOpen', false);
     refForm.value?.reset();
     refForm.value?.resetValidation();
   });
 };
-
 const onSubmit = () => {
-  isFetching.value = true;
+  console.log(isFetching.value)
   refForm.value?.validate().then(async ({ valid }) => {
     if (valid) {
+      isFetching.value = true;
       try {
-        const response = await axios.post('/users', {
-          name: name.value,
-          login: login.value,
-          password: password.value,
-          role_id: role_id.value,
-        });
+        let body = {
+          title: title.value,
+          phone_number: phone_number.value,
+          description: description.value,
+        };
 
-        if (response.status == 201) {
+        const response = await axios.patch(`/companies/${props.id}`, body);
+        if (response.status == 200) {
           emit('fetchDatas');
 
           closeNavigationDrawer();
         }
       } catch (error) {
-        if (error.response.data.message == 'The login has already been taken.') {
-          toast('Ushbu login bant.', {
-            theme: 'auto',
-            type: 'error',
-            dangerouslyHTMLString: true,
-          });
-        } else {
-          toast(error.response.data.message, {
-            theme: 'auto',
-            type: 'error',
-            dangerouslyHTMLString: true,
-          });
-        }
-        isValidLogin.value = false;
-      } 
+        toast(error.response.data.message, {
+          theme: 'auto',
+          type: 'error',
+          dangerouslyHTMLString: true,
+        });
+      } finally {
+        isFetching.value = false;
+      }
     }
   });
-  isFetching.value = false;
 };
-
 
 const handleDrawerModelValueUpdate = (val) => {
   emit('update:isDrawerOpen', val);
 };
 
-const fetchRoles = async function () {
-  const r = await axios.get('/roles');
-  r.data.roles.shift();
-  roles_list.value = r.data.roles;
+const fetchDataById = async () => {
+  isFetchingStart.value = true;
+  try {
+    const { data } = await axios.get(`/companies/${props.id}`);
+    title.value = data.title;
+    phone_number.value = data.phone_number;
+    description.value = data.description;
+  } catch (error) {
+    toast(error?.response?.data?.message, {
+      theme: 'auto',
+      type: 'error',
+      dangerouslyHTMLString: true,
+    });
+  } finally {
+    isFetchingStart.value = false;
+  }
 };
 
-watchEffect(fetchRoles);
+watch(
+  () => props.isDrawerOpen,
+  (newVal) => newVal && fetchDataById(),
+);
 </script>
 
 <template>
@@ -96,7 +103,7 @@ watchEffect(fetchRoles);
     @update:model-value="handleDrawerModelValueUpdate"
   >
     <!-- 👉 Title -->
-    <AppDrawerHeaderSection title="Add Employee" @cancel="closeNavigationDrawer" />
+    <AppDrawerHeaderSection title="Update Employee" @cancel="closeNavigationDrawer" />
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
@@ -108,33 +115,19 @@ watchEffect(fetchRoles);
             v-model="isFormValid"
             @submit.prevent="onSubmit"
             :disabled="isFetching"
+            v-if="!isFetchingStart"
           >
             <VRow>
               <VCol cols="12">
-                <VTextField v-model="name" :rules="[requiredValidator]" label="Name" />
+                <VTextField v-model="title" label="Title" />
               </VCol>
 
               <VCol cols="12">
-                <VTextField
-                  v-model="login"
-                  :rules="[requiredValidator, () => isValidLogin]"
-                  label="Login"
-                />
+                <VTextField v-model="phone_number" label="Phone number" />
               </VCol>
 
               <VCol cols="12">
-                <VTextField v-model="password" :rules="[requiredValidator]" label="Password" />
-              </VCol>
-              <VCol cols="12">
-                <VSelect
-                  persistent-hint
-                  v-model="role_id"
-                  label="Select role"
-                  :rules="[requiredValidator]"
-                  :items="roles_list"
-                  item-title="name_ru"
-                  item-value="id"
-                />
+                <VTextarea v-model="description" label="Description" />
               </VCol>
 
               <!-- 👉 Submit and Cancel -->
@@ -148,6 +141,10 @@ watchEffect(fetchRoles);
               </VCol>
             </VRow>
           </VForm>
+
+          <div v-if="isFetchingStart" class="d-flex h-screen align-center justify-center">
+            <VProgressCircular color="primary" indeterminate></VProgressCircular>
+          </div>
         </VCardText>
       </VCard>
     </PerfectScrollbar>

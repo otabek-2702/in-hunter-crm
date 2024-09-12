@@ -2,14 +2,12 @@ import { setupLayouts } from 'virtual:generated-layouts'
 import { createRouter, createWebHistory } from 'vue-router'
 import { isUserLoggedIn } from './utils'
 import routes from '~pages'
-import SecondPage from "@/pages/second-page.vue"
 import Login from "@/pages/login.vue"
-import Index from "@/pages/index.vue"
 import NotAuthorized from "@/pages/not-authorized.vue";
-import Tables from "@/pages/tables.vue";
 import DefaultLayoutWithVerticalNav from '@/layouts/default.vue';
 import ability from "@/plugins/casl/ability";
 import Forbidden from "@/pages/forbidden.vue";
+import Candidates from '@/pages/candidates.vue'
 
 
 const router = createRouter({
@@ -39,12 +37,7 @@ const router = createRouter({
         {
           path: '',
           name: 'Index',
-          component: Index,
-        },
-        {
-          path: 'tables',
-          name: 'Tables',
-          component: Tables,
+          redirect: {name: 'Candidates'}
         },
         {
           path: '/roles',
@@ -58,7 +51,7 @@ const router = createRouter({
         {
           path: '/candidates',
           name: 'Candidates',
-          component: () => import("@/pages/candidates.vue"),
+          component: Candidates,
           meta: {
             action: 'show',
             subject:'Candidates',
@@ -83,14 +76,15 @@ const router = createRouter({
           }
         },
         {
-          path: 'second-page',
-          name: 'SecondPage',
-          component: SecondPage,
+          path: 'vacancies',
+          name: 'Vacancies',
+          component: ()=> import("@/pages/vacancies.vue"),
           meta: {
-            action: 'all',
-            subject:'Administrator',
+            action: 'show',
+            subject:'Vacancies',
           }
         },
+
       ],
     },
     ...setupLayouts(routes),
