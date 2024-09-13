@@ -59,19 +59,18 @@ const onSubmit = () => {
             dangerouslyHTMLString: true,
           });
         } else {
-          toast(error.response.data.message, {
+          toast(error?.message, {
             theme: 'auto',
             type: 'error',
             dangerouslyHTMLString: true,
           });
         }
         isValidLogin.value = false;
-      } 
+      }
     }
   });
   isFetching.value = false;
 };
-
 
 const handleDrawerModelValueUpdate = (val) => {
   emit('update:isDrawerOpen', val);

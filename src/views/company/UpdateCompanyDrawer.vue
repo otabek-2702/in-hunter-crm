@@ -17,7 +17,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:isDrawerOpen','fetchDatas']);
+const emit = defineEmits(['update:isDrawerOpen', 'fetchDatas']);
 const isFetching = ref(false);
 const isFetchingStart = ref(true);
 const isFormValid = ref(false);
@@ -35,7 +35,7 @@ const closeNavigationDrawer = () => {
   });
 };
 const onSubmit = () => {
-  console.log(isFetching.value)
+  console.log(isFetching.value);
   refForm.value?.validate().then(async ({ valid }) => {
     if (valid) {
       isFetching.value = true;
@@ -53,7 +53,7 @@ const onSubmit = () => {
           closeNavigationDrawer();
         }
       } catch (error) {
-        toast(error.response.data.message, {
+        toast(error?.message, {
           theme: 'auto',
           type: 'error',
           dangerouslyHTMLString: true,
@@ -103,7 +103,7 @@ watch(
     @update:model-value="handleDrawerModelValueUpdate"
   >
     <!-- 👉 Title -->
-    <AppDrawerHeaderSection title="Update Employee" @cancel="closeNavigationDrawer" />
+    <AppDrawerHeaderSection title="Update Company" @cancel="closeNavigationDrawer" />
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
@@ -117,17 +117,19 @@ watch(
             :disabled="isFetching"
             v-if="!isFetchingStart"
           >
-            <VRow>
+          <VRow>
               <VCol cols="12">
-                <VTextField v-model="title" label="Title" />
+                <VTextField v-model="title" :rules="[requiredValidator]" label="Title" />
               </VCol>
-
               <VCol cols="12">
-                <VTextField v-model="phone_number" label="Phone number" />
+                <VTextField
+                  v-model="phone_number"
+                  :rules="[requiredValidator]"
+                  label="Phone number"
+                />
               </VCol>
-
               <VCol cols="12">
-                <VTextarea v-model="description" label="Description" />
+                <VTextarea label="Description" v-model="description" />
               </VCol>
 
               <!-- 👉 Submit and Cancel -->

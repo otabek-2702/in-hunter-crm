@@ -17,13 +17,10 @@ const emit = defineEmits(['update:isDrawerOpen', 'fetchDatas']);
 
 const isFetching = ref(false);
 const isFormValid = ref(false);
-const isValidLogin = ref(true);
 const refForm = ref();
-const roles_list = ref([]);
-const name = ref('');
-const login = ref('');
-const password = ref('');
-const role_id = ref('');
+const title = ref('');
+const phone_number = ref('');
+const description = ref('');
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -39,11 +36,10 @@ const onSubmit = () => {
   refForm.value?.validate().then(async ({ valid }) => {
     if (valid) {
       try {
-        const response = await axios.post('/users', {
-          name: name.value,
-          login: login.value,
-          password: password.value,
-          role_id: role_id.value,
+        const response = await axios.post('/companies', {
+          title: title.value,
+          phone_number: phone_number.value,
+          description: description.value,
         });
 
         if (response.status == 201) {
@@ -52,38 +48,21 @@ const onSubmit = () => {
           closeNavigationDrawer();
         }
       } catch (error) {
-        if (error.response.data.message == 'The login has already been taken.') {
-          toast('Ushbu login bant.', {
-            theme: 'auto',
-            type: 'error',
-            dangerouslyHTMLString: true,
-          });
-        } else {
-          toast(error.response.data.message, {
-            theme: 'auto',
-            type: 'error',
-            dangerouslyHTMLString: true,
-          });
-        }
-        isValidLogin.value = false;
-      } 
+        toast(error?.message, {
+          theme: 'auto',
+          type: 'error',
+          dangerouslyHTMLString: true,
+        });
+      } finally {
+        isFetching.value = false;
+      }
     }
   });
-  isFetching.value = false;
 };
-
 
 const handleDrawerModelValueUpdate = (val) => {
   emit('update:isDrawerOpen', val);
 };
-
-const fetchRoles = async function () {
-  const r = await axios.get('/roles');
-  r.data.roles.shift();
-  roles_list.value = r.data.roles;
-};
-
-watchEffect(fetchRoles);
 </script>
 
 <template>
@@ -96,7 +75,7 @@ watchEffect(fetchRoles);
     @update:model-value="handleDrawerModelValueUpdate"
   >
     <!-- 👉 Title -->
-    <AppDrawerHeaderSection title="Add Employee" @cancel="closeNavigationDrawer" />
+    <AppDrawerHeaderSection title="Add Company" @cancel="closeNavigationDrawer" />
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
@@ -111,30 +90,17 @@ watchEffect(fetchRoles);
           >
             <VRow>
               <VCol cols="12">
-                <VTextField v-model="name" :rules="[requiredValidator]" label="Name" />
+                <VTextField v-model="title" :rules="[requiredValidator]" label="Title" />
               </VCol>
-
               <VCol cols="12">
                 <VTextField
-                  v-model="login"
-                  :rules="[requiredValidator, () => isValidLogin]"
-                  label="Login"
-                />
-              </VCol>
-
-              <VCol cols="12">
-                <VTextField v-model="password" :rules="[requiredValidator]" label="Password" />
-              </VCol>
-              <VCol cols="12">
-                <VSelect
-                  persistent-hint
-                  v-model="role_id"
-                  label="Select role"
+                  v-model="phone_number"
                   :rules="[requiredValidator]"
-                  :items="roles_list"
-                  item-title="name_ru"
-                  item-value="id"
+                  label="Phone number"
                 />
+              </VCol>
+              <VCol cols="12">
+                <VTextarea label="Description" v-model="description" />
               </VCol>
 
               <!-- 👉 Submit and Cancel -->

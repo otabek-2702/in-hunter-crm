@@ -14,8 +14,9 @@ const props = defineProps({
 
 const languages_list = ref([]);
 
-const emit = defineEmits(['update:isDrawerOpen', 'candidateData']);
+const emit = defineEmits(['update:isDrawerOpen', 'fetchDatas']);
 
+const isFetching = ref(false);
 const isFormValid = ref(false);
 const refForm = ref();
 const full_name = ref('');
@@ -38,25 +39,32 @@ const closeNavigationDrawer = () => {
 };
 
 const onSubmit = () => {
-  refForm.value?.validate().then(({ valid }) => {
+  refForm.value?.validate().then(async ({ valid }) => {
     if (valid) {
-      emit('candidateData', {
-        id: 0,
-        full_name: full_name.value,
-        age: age.value,
-        languages: languages.value,
-        positive_skills: positive_skills.value,
-        apps_text: apps_text.value,
-        apps: apps.value,
-        gender: gender.value,
-        phone_number: phone_number.value,
-        address: address.value,
-      });
-      emit('update:isDrawerOpen', false);
-      nextTick(() => {
-        refForm.value?.reset();
-        refForm.value?.resetValidation();
-      });
+      isFetching.value = true;
+      try {
+        await axios.post('/candidates', {
+          full_name: full_name.value,
+          age: age.value,
+          languages: Array.from(languages.value),
+          positive_skills: positive_skills.value,
+          apps_text: apps_text.value,
+          apps: apps.value,
+          gender: gender.value,
+          phone_number: phone_number.value,
+          address: address.value,
+        });
+        emit('fetchDatas');
+        emit('update:isDrawerOpen', false);
+        nextTick(() => {
+          refForm.value?.reset();
+          refForm.value?.resetValidation();
+        });
+      } catch (e) {
+        console.error(e);
+      } finally {
+        isFetching.value = false;
+      }
     }
   });
 };
@@ -66,8 +74,16 @@ const handleDrawerModelValueUpdate = (val) => {
 };
 
 const fetchLanguages = async function () {
-  const r = await axios.get('/languages');
-  languages_list.value = r.data;
+  try {
+    const response = await axios.get('/languages');
+    languages_list.value = response.data;
+  } catch (error) {
+    toast(error?.message, {
+      theme: 'auto',
+      type: 'error',
+      dangerouslyHTMLString: true,
+    });
+  }
 };
 
 watchEffect(fetchLanguages);
@@ -149,7 +165,9 @@ watchEffect(fetchLanguages);
 
               <!-- 👉 Submit and Cancel -->
               <VCol cols="12">
-                <VBtn type="submit" class="me-3"> Submit </VBtn>
+                <VBtn :loading="isFetching" :disabled="isFetching" type="submit" class="me-3">
+                  Submit
+                </VBtn>
                 <VBtn type="reset" variant="tonal" color="secondary" @click="closeNavigationDrawer">
                   Cancel
                 </VBtn>

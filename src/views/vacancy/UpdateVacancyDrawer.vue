@@ -17,7 +17,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:isDrawerOpen','fetchDatas']);
+const emit = defineEmits(['update:isDrawerOpen', 'fetchDatas']);
 const isFetching = ref(false);
 const isFetchingStart = ref(true);
 const isFormValid = ref(false);
@@ -35,7 +35,7 @@ const closeNavigationDrawer = () => {
   });
 };
 const onSubmit = () => {
-  console.log(isFetching.value)
+  console.log(isFetching.value);
   refForm.value?.validate().then(async ({ valid }) => {
     if (valid) {
       isFetching.value = true;
@@ -53,7 +53,7 @@ const onSubmit = () => {
           closeNavigationDrawer();
         }
       } catch (error) {
-        toast(error.response.data.message, {
+        toast(error?.message, {
           theme: 'auto',
           type: 'error',
           dangerouslyHTMLString: true,

@@ -5,6 +5,7 @@ import AddNewCompanyDrawer from '@/views/company/AddNewCompanyDrawer.vue';
 import UpdateCompanyDrawer from '@/views/company/UpdateCompanyDrawer.vue';
 import Skeleton from '@/views/skeleton/Skeleton.vue';
 import DeleteItemDialog from '@/@core/components/DeleteItemDialog.vue';
+import { toast } from 'vue3-toastify';
 
 const searchQuery = ref('');
 const rowPerPage = ref(10);
@@ -105,7 +106,7 @@ const deleteItem = async function (id) {
     await fetchData(true);
     isDialogVisible.value = false;
   } catch (error) {
-    toast(error.response.data.message, {
+    toast(error?.message, {
       theme: 'auto',
       type: 'error',
       dangerouslyHTMLString: true,
@@ -140,7 +141,7 @@ const deleteItem = async function (id) {
                 density="compact"
                 class="me-6"
               />
-              <VBtn @click="isAddNewEmployeeDrawerVisible = true"> Add new Employee </VBtn>
+              <VBtn @click="isAddNewCompanyDrawerVisible = true"> Add new Company </VBtn>
             </VCol>
           </VCardText>
 
@@ -213,12 +214,12 @@ const deleteItem = async function (id) {
 
     <AddNewCompanyDrawer
       v-model:isDrawerOpen="isAddNewCompanyDrawerVisible"
-      @fetchDatas="() =>fetchData(true)"
+      @fetchDatas="() => fetchData(true)"
     />
     <UpdateCompanyDrawer
       :id="updateID"
       v-model:isDrawerOpen="isUpdateCompanyDrawerVisible"
-      @fetchDatas="() =>fetchData(true)"
+      @fetchDatas="() => fetchData(true)"
     />
   </section>
 </template>

@@ -27,9 +27,9 @@ const fetchData = async (force = false) => {
     return; // Если запрос уже выполняется или страница не изменилась и фильтры не изменялись
   }
   const url = `/vacancies?page=${currentPage.value}`;
-  if (selectedState.value) url = url + '&state_id='+ selectedState.value;
+  if (selectedState.value) url = url + '&state_id=' + selectedState.value;
   // if (selectedState.value) url+=`&job_position_id=${''}`
-  if (selectedCompany.value) url = url + '&company_id=' + selectedCompany.value
+  if (selectedCompany.value) url = url + '&company_id=' + selectedCompany.value;
 
   try {
     const vacancies_r = await axios.get(url);
@@ -117,7 +117,7 @@ const deleteItem = async function (id) {
     await fetchData(true);
     isDialogVisible.value = false;
   } catch (error) {
-    toast(error.response.data.message, {
+    toast(error?.message, {
       theme: 'auto',
       type: 'error',
       dangerouslyHTMLString: true,
@@ -196,7 +196,7 @@ const resolveVacancyState = (state) => {
   <section>
     <VRow>
       <VCol cols="12">
-        <VCard title="Search Filters" >
+        <VCard title="Search Filters">
           <DeleteItemDialog
             @confirm="deleteItem"
             :isDialogVisible="isDialogVisible"

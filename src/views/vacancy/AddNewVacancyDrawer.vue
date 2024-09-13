@@ -61,7 +61,7 @@ const onSubmit = () => {
             dangerouslyHTMLString: true,
           });
         } else {
-          toast(error.response.data.message, {
+          toast(error?.message, {
             theme: 'auto',
             type: 'error',
             dangerouslyHTMLString: true,

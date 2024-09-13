@@ -3,8 +3,11 @@ import { computed, ref, watch, watchEffect } from 'vue';
 import axios from '@axios';
 import AddNewCandidateDrawer from '@/views/candidate/AddNewCandidateDrawer.vue';
 import UpdateCandidateDrawer from '@/views/candidate/UpdateCandidateDrawer.vue';
-import ChangeStateCandidate from '@core/demo/ChangeStateCandidate.vue';
+import ChangeStateCandidate from '@/views/candidate/ChangeStateCandidate.vue';
 import Skeleton from '@/views/skeleton/Skeleton.vue';
+import CandidateInfo from '@/views/candidate/CandidateInfo.vue';
+import CandidateAccept from '@/views/candidate/CandidateAccept.vue';
+import { toast } from 'vue3-toastify';
 
 const searchQuery = ref('');
 const rowPerPage = ref(10);
@@ -14,8 +17,8 @@ const totalCandidates = ref(0);
 const candidates = ref([]);
 const updateID = ref(0);
 
-const selectedState = ref('');
-const selectedGender = ref('');
+const selectedState = ref();
+const selectedGender = ref();
 
 const states_list = ref([]);
 const gender_list = ref([
@@ -34,7 +37,7 @@ const isFetching = ref(false);
 const filtersChanged = ref(false);
 
 const fetchCandidates = async (force = false) => {
-  isFetching.value =true
+  isFetching.value = true;
   if (
     !force &&
     (isFetching.value || (currentPage.value === lastFetchedPage.value && !filtersChanged.value))
@@ -98,8 +101,16 @@ const searchCandidates = async () => {
 };
 
 const fetchStates = async () => {
-  const states_r = await axios.get('/states');
-  states_list.value = states_r.data.states.filter(el => el.table === "candidates");
+  try {
+    const states_r = await axios.get(`/states`);
+    states_list.value = states_r.data.states.filter((el) => el.table === 'candidates');
+  } catch (error) {
+    toast(error?.message, {
+      theme: 'auto',
+      type: 'error',
+      dangerouslyHTMLString: true,
+    });
+  }
 };
 
 watchEffect(fetchCandidates);
@@ -110,9 +121,10 @@ const resolveUserRoleVariant = (state) => {
   const roleMap = {
     new: { color: 'primary', icon: 'bx-user' },
     cancel: { color: 'warning', icon: 'bx-cog' },
+    archive: { color: 'secondary', icon: 'bx-cog' },
     success: { color: 'success', icon: 'bx-doughnut-chart' },
     invite: { color: 'info', icon: 'bx-pencil' },
-    archive: { color: 'error', icon: 'bx-laptop' },
+    block: { color: 'error', icon: 'bx-laptop' },
   };
 
   return roleMap[roleLowerCase] || { color: 'primary', icon: 'bx-user' };
@@ -120,7 +132,7 @@ const resolveUserRoleVariant = (state) => {
 
 const isAddNewCandidateDrawerVisible = ref(false);
 const isUpdateCandidateDrawerVisible = ref(false);
-
+const isCandidateInfoDialogVisible = ref(false);
 
 // 👉 Watching current page
 watchEffect(() => {
@@ -135,74 +147,20 @@ const paginationData = computed(() => {
   return `${firstIndex}-${lastIndex} of ${totalCandidates.value}`;
 });
 
-const addNewCandidate = async (candidateData) => {
-  const {
-    full_name,
-    age,
-    languages,
-    positive_skills,
-    apps_text,
-    apps,
-    gender,
-    phone_number,
-    address,
-  } = candidateData;
-  try {
-    await axios.post('/candidates', {
-      full_name,
-      age,
-      languages: Array.from(languages),
-      positive_skills,
-      apps_text,
-      apps,
-      gender,
-      phone_number,
-      address,
-    });
-    await fetchCandidates(true);
-  } catch (e) {
-    console.error(e);
-  }
-};
-const updateCandidate = async ({
-  full_name,
-  age,
-  languages,
-  id,
-  positive_skills,
-  apps_text,
-  apps,
-  gender,
-  phone_number,
-  address,
-}) => {
-  try {
-    await axios.put(`/candidates/${id}`, {
-      full_name,
-      age,
-      apps_text,
-      apps,
-      gender,
-      phone_number,
-      address,
-      positive_skills,
-      languages: Array.from(languages),
-    });
-
-    // Убедитесь, что fetchCandidates вызывается только после успешного обновления
-    await fetchCandidates(true);
-  } catch (error) {
-    console.error('Ошибка при обновлении кандидата:', error);
-  }
-};
-
 const openEditDrawer = (id) => {
   updateID.value = id;
   isUpdateCandidateDrawerVisible.value = true;
 };
 
-const isDialogVisible = ref(false);
+const candidateViewId = ref(0);
 
+const handleCandidateOpen = (id) => {
+  console.log(id);
+  candidateViewId.value = id;
+  isCandidateInfoDialogVisible.value = true;
+};
+
+const isDialogVisible = ref(false);
 </script>
 
 <template>
@@ -213,7 +171,7 @@ const isDialogVisible = ref(false);
           <VDivider />
 
           <VCardText class="d-flex flex-wrap">
-            <VCol cols="3" sm="3" >
+            <VCol cols="3" sm="3">
               <VSelect
                 v-model="selectedState"
                 label="Select State"
@@ -248,7 +206,7 @@ const isDialogVisible = ref(false);
                 density="compact"
                 class="me-6"
               />
-              <VBtn @click="isAddNewCandidateDrawerVisible = true" > Add new Candidate </VBtn>
+              <VBtn @click="isAddNewCandidateDrawerVisible = true"> Add new Candidate </VBtn>
             </VCol>
 
             <!-- </div> -->
@@ -270,13 +228,11 @@ const isDialogVisible = ref(false);
             </thead>
 
             <tbody v-show="candidates.length">
-              <tr
-                v-for="candidate in candidates"
-                :key="candidate.id"
-                @click="handle2(candidate.id)"
-              >
+              <tr v-for="candidate in candidates" :key="candidate.id">
                 <td>{{ candidate.id }}</td>
-                <td>{{ candidate.full_name }}</td>
+                <td @click="() => handleCandidateOpen(candidate.id)" :style="{ cursor: 'pointer' }">
+                  {{ candidate.full_name }}
+                </td>
                 <td>{{ candidate.age }}</td>
                 <td>{{ candidate.address }}</td>
                 <td>{{ candidate.phone_number }}</td>
@@ -303,11 +259,30 @@ const isDialogVisible = ref(false);
                     style="color: rgb(var(--v-global-theme-primary))"
                   ></VIcon>
 
-                  <ChangeStateCandidate :isDialogVisible="true" :id="candidate.id"> </ChangeStateCandidate>
+                  <ChangeStateCandidate
+                    v-if="
+                      !(
+                        candidate.state.slug === 'cancel' ||
+                        candidate.state.slug === 'block' ||
+                        candidate.state.slug === 'invite'||
+                        candidate.state.slug === 'success'
+                      )
+                    "
+                    @fetchDatas="() => fetchCandidates(true)"
+                    :isDialogVisible="true"
+                    :id="candidate.id"
+                    :state_slug="candidate.state.slug"
+                  />
+                  <CandidateAccept
+                    v-if="candidate.state.slug === 'invite'"
+                    @fetchDatas="() => fetchCandidates(true)"
+                    :isDialogVisible="true"
+                    :id="candidate.id"
+                  />
                 </td>
               </tr>
             </tbody>
-            <Skeleton :count="7" v-if="isFetching" />
+            <Skeleton :count="7" v-if="isFetching && !candidates.length" />
 
             <tfoot v-show="!candidates.length">
               <tr>
@@ -337,12 +312,18 @@ const isDialogVisible = ref(false);
 
     <AddNewCandidateDrawer
       v-model:isDrawerOpen="isAddNewCandidateDrawerVisible"
-      @candidateData="addNewCandidate"
+      @fetchDatas="() => fetchCandidates(true)"
     />
     <UpdateCandidateDrawer
       :id="updateID"
       v-model:isDrawerOpen="isUpdateCandidateDrawerVisible"
-      @candidateData="updateCandidate"
+      @fetchDatas="() => fetchCandidates(true)"
+    />
+
+    <CandidateInfo
+      v-model:isDrawerOpen="isCandidateInfoDialogVisible"
+      :candidateId="candidateViewId"
+      @fetchDatas="() => fetchCandidates(true)"
     />
   </section>
 </template>

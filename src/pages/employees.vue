@@ -5,6 +5,7 @@ import AddNewEmployeeDrawer from '@/views/employee/AddNewEmployeeDrawer.vue';
 import UpdateEmployeeDrawer from '@/views/employee/UpdateEmployeeDrawer.vue';
 import Skeleton from '@/views/skeleton/Skeleton.vue';
 import DeleteItemDialog from '@/@core/components/DeleteItemDialog.vue';
+import { toast } from 'vue3-toastify';
 
 const searchQuery = ref('');
 const rowPerPage = ref(10);
@@ -79,7 +80,6 @@ const paginationData = computed(() => {
 
 // Pages end
 
-
 const openEditDrawer = (id) => {
   updateID.value = id;
   isUpdateEmployeeDrawerVisible.value = true;
@@ -87,7 +87,7 @@ const openEditDrawer = (id) => {
 
 // Delete
 const isDialogVisible = ref(false);
-const isDeleting = ref(false)
+const isDeleting = ref(false);
 const roleData = ref({
   id: 1,
   name: null,
@@ -101,19 +101,18 @@ const confirmDelete = function (id, name) {
 
 const deleteItem = async function (id) {
   try {
-    isDeleting.value=true
+    isDeleting.value = true;
     await axios.delete('/users/' + id);
     await fetchEmployees(true);
     isDialogVisible.value = false;
   } catch (error) {
-    toast(error.response.data.message, {
+    toast(error?.message, {
       theme: 'auto',
       type: 'error',
       dangerouslyHTMLString: true,
     });
-  }finally{
-    isDeleting.value=false
-
+  } finally {
+    isDeleting.value = false;
   }
 };
 </script>

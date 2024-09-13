@@ -69,7 +69,7 @@ const onSubmit = () => {
             dangerouslyHTMLString: true,
           });
         } else {
-          toast(error.response.data.message, {
+          toast(error?.message, {
             theme: 'auto',
             type: 'error',
             dangerouslyHTMLString: true,
@@ -93,7 +93,7 @@ const fetchUser = async () => {
     login.value = user.data.login;
     role_id.value = user.data.role.id;
   } catch (error) {
-    toast(error.response.data.message, {
+    toast(error?.message, {
       theme: 'auto',
       type: 'error',
       dangerouslyHTMLString: true,

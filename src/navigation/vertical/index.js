@@ -1,8 +1,8 @@
 export default [
   {
-    title: 'Home',
+    title: 'Statistics',
     to: { name: 'Index' },
-    icon: { icon: 'bx-home-alt' },
+    icon: { icon: 'mdi-chart-areaspline' },
     subject: 'post',
     action: 'create'
   },
