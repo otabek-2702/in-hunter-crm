@@ -22,10 +22,10 @@ const isFetching = ref(false);
 const isFormValid = ref(false);
 const refForm = ref();
 const roles_list = ref([]);
-const name = ref('');
-const login = ref('');
-const password = ref('');
-const role_id = ref('');
+const name = ref();
+const login = ref();
+const password = ref();
+const role_id = ref();
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -84,6 +84,12 @@ const onSubmit = () => {
 
 const handleDrawerModelValueUpdate = (val) => {
   emit('update:isDrawerOpen', val);
+  if (!val) {
+    nextTick(() => {
+      refForm.value?.reset();
+      refForm.value?.resetValidation();
+    });
+  }
 };
 
 const fetchUser = async () => {
@@ -93,11 +99,7 @@ const fetchUser = async () => {
     login.value = user.data.login;
     role_id.value = user.data.role.id;
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   }
 };
 

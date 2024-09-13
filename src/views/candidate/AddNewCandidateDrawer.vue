@@ -19,15 +19,15 @@ const emit = defineEmits(['update:isDrawerOpen', 'fetchDatas']);
 const isFetching = ref(false);
 const isFormValid = ref(false);
 const refForm = ref();
-const full_name = ref('');
-const phone_number = ref('');
-const age = ref('');
-const address = ref('');
+const full_name = ref();
+const phone_number = ref();
+const age = ref();
+const address = ref();
 const gender = ref('man');
-const positive_skills = ref('');
-const apps_text = ref('');
-const apps = ref('');
-const languages = ref([]);
+const positive_skills = ref();
+const apps_text = ref();
+const apps = ref();
+const languages = ref();
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -60,8 +60,8 @@ const onSubmit = () => {
           refForm.value?.reset();
           refForm.value?.resetValidation();
         });
-      } catch (e) {
-        console.error(e);
+      } catch (error) {
+        console.error(error);
       } finally {
         isFetching.value = false;
       }
@@ -71,6 +71,12 @@ const onSubmit = () => {
 
 const handleDrawerModelValueUpdate = (val) => {
   emit('update:isDrawerOpen', val);
+  if (!val) {
+    nextTick(() => {
+      refForm.value?.reset();
+      refForm.value?.resetValidation();
+    });
+  }
 };
 
 const fetchLanguages = async function () {
@@ -78,11 +84,7 @@ const fetchLanguages = async function () {
     const response = await axios.get('/languages');
     languages_list.value = response.data;
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   }
 };
 

@@ -20,7 +20,7 @@ const emit = defineEmits([
 
 const isFormValid = ref(false)
 const refForm = ref()
-const Name = ref('')
+const Name =ref()
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -48,6 +48,12 @@ const onSubmit = () => {
 
 const handleDrawerModelValueUpdate = val => {
   emit('update:isDrawerOpen', val)
+  if (!val) {
+    nextTick(() => {
+      refForm.value?.reset();
+      refForm.value?.resetValidation();
+    });
+  }
 }
 </script>
 

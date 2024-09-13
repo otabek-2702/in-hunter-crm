@@ -20,10 +20,10 @@ const isFormValid = ref(false);
 const isValidLogin = ref(true);
 const refForm = ref();
 const roles_list = ref([]);
-const name = ref('');
-const login = ref('');
-const password = ref('');
-const role_id = ref('');
+const name = ref();
+const login = ref();
+const password = ref();
+const role_id = ref();
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -59,11 +59,7 @@ const onSubmit = () => {
             dangerouslyHTMLString: true,
           });
         } else {
-          toast(error?.message, {
-            theme: 'auto',
-            type: 'error',
-            dangerouslyHTMLString: true,
-          });
+          console.error('Ошибка:', error);
         }
         isValidLogin.value = false;
       }
@@ -74,6 +70,12 @@ const onSubmit = () => {
 
 const handleDrawerModelValueUpdate = (val) => {
   emit('update:isDrawerOpen', val);
+  if (!val) {
+    nextTick(() => {
+      refForm.value?.reset();
+      refForm.value?.resetValidation();
+    });
+  }
 };
 
 const fetchRoles = async function () {

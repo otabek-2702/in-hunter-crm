@@ -5,7 +5,6 @@ import AddNewCompanyDrawer from '@/views/company/AddNewCompanyDrawer.vue';
 import UpdateCompanyDrawer from '@/views/company/UpdateCompanyDrawer.vue';
 import Skeleton from '@/views/skeleton/Skeleton.vue';
 import DeleteItemDialog from '@/@core/components/DeleteItemDialog.vue';
-import { toast } from 'vue3-toastify';
 
 const searchQuery = ref('');
 const rowPerPage = ref(10);
@@ -34,8 +33,8 @@ const fetchData = async (force = false) => {
     totalEmployees.value = companies_r.data['meta']['total'];
     totalPage.value = companies_r.data['meta']['last_page'];
     rowPerPage.value = companies_r.data['meta']['per_page'];
-  } catch (e) {
-    console.error('Ошибка загрузки кандидатов:', e);
+  } catch (error) {
+    console.error('Ошибка загрузки кандидатов:', error);
   } finally {
     isFetching.value = false;
   }
@@ -106,11 +105,7 @@ const deleteItem = async function (id) {
     await fetchData(true);
     isDialogVisible.value = false;
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   } finally {
     isDeleting.value = false;
   }

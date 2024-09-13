@@ -23,8 +23,8 @@ const emit = defineEmits([
 
 const isFormValid = ref(false)
 const refForm = ref()
-const name_uz = ref('')
-const name_ru = ref('')
+const name_uz =ref()
+const name_ru =ref()
 const permission = ref()
 
 // 👉 drawer close
@@ -56,6 +56,12 @@ const onSubmit = () => {
 
 const handleDrawerModelValueUpdate = val => {
   emit('update:isDrawerOpen', val)
+  if (!val) {
+    nextTick(() => {
+      refForm.value?.reset();
+      refForm.value?.resetValidation();
+    });
+  }
 }
 
 const fetchPermissions = async function(){

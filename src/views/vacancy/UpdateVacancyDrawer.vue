@@ -22,9 +22,9 @@ const isFetching = ref(false);
 const isFetchingStart = ref(true);
 const isFormValid = ref(false);
 const refForm = ref();
-const title = ref('');
-const phone_number = ref('');
-const description = ref('');
+const title = ref();
+const phone_number = ref();
+const description = ref();
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -48,16 +48,17 @@ const onSubmit = () => {
 
         const response = await axios.patch(`/companies/${props.id}`, body);
         if (response.status == 200) {
+          toast('Успешно', {
+            theme: 'auto',
+            type: 'success',
+            dangerouslyHTMLString: true,
+          });
           emit('fetchDatas');
 
           closeNavigationDrawer();
         }
       } catch (error) {
-        toast(error?.message, {
-          theme: 'auto',
-          type: 'error',
-          dangerouslyHTMLString: true,
-        });
+        console.error('Ошибка:', error);
       } finally {
         isFetching.value = false;
       }
@@ -67,6 +68,12 @@ const onSubmit = () => {
 
 const handleDrawerModelValueUpdate = (val) => {
   emit('update:isDrawerOpen', val);
+  if (!val) {
+    nextTick(() => {
+      refForm.value?.reset();
+      refForm.value?.resetValidation();
+    });
+  }
 };
 
 const fetchDataById = async () => {
@@ -77,11 +84,7 @@ const fetchDataById = async () => {
     phone_number.value = data.phone_number;
     description.value = data.description;
   } catch (error) {
-    toast(error?.response?.data?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка:', error);
   } finally {
     isFetchingStart.value = false;
   }

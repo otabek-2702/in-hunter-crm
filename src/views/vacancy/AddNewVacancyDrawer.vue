@@ -22,10 +22,10 @@ const isFormValid = ref(false);
 const isValidLogin = ref(true);
 const refForm = ref();
 // const companies_list = ref([]);
-const company_id = ref('');
-const job_position_id = ref('');
-const quantity = ref('');
-const description = ref('');
+const company_id = ref();
+const job_position_id = ref();
+const quantity = ref();
+const description = ref();
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -49,24 +49,16 @@ const onSubmit = () => {
         });
 
         if (response.status == 200) {
+          toast('Успешно', {
+            theme: 'auto',
+            type: 'success',
+            dangerouslyHTMLString: true,
+          });
           emit('fetchDatas');
-
           closeNavigationDrawer();
         }
       } catch (error) {
-        if (error.response.data.message == 'The login has already been taken.') {
-          toast('Ushbu login bant.', {
-            theme: 'auto',
-            type: 'error',
-            dangerouslyHTMLString: true,
-          });
-        } else {
-          toast(error?.message, {
-            theme: 'auto',
-            type: 'error',
-            dangerouslyHTMLString: true,
-          });
-        }
+        console.error('Ошибка:', error);
       } finally {
         isFetching.value = false;
       }
@@ -76,6 +68,12 @@ const onSubmit = () => {
 
 const handleDrawerModelValueUpdate = (val) => {
   emit('update:isDrawerOpen', val);
+  if (!val) {
+    nextTick(() => {
+      refForm.value?.reset();
+      refForm.value?.resetValidation();
+    });
+  }
 };
 </script>
 

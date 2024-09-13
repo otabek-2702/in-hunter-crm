@@ -20,15 +20,15 @@ const emit = defineEmits(['update:isDrawerOpen, fetchDatas']);
 const refForm = ref();
 const isFetching = ref(false);
 const languages_list = ref([]);
-const full_name = ref('');
-const phone_number = ref('');
-const age = ref('');
-const address = ref('');
+const full_name = ref();
+const phone_number = ref();
+const age = ref();
+const address = ref();
 const gender = ref('man');
-const positive_skills = ref('');
-const apps_text = ref('');
-const apps = ref('');
-const photo = ref('');
+const positive_skills = ref();
+const apps_text = ref();
+const apps = ref();
+const photo = ref();
 const languages = ref([]);
 
 const onFormCancel = () => {
@@ -36,7 +36,7 @@ const onFormCancel = () => {
   nextTick(() => {
     setTimeout(() => {
       refForm.value?.reset();
-    }, 500)
+    }, 500);
   });
 };
 
@@ -45,7 +45,6 @@ const onFormSubmit = () => {
   refForm.value.validate().then(async ({ valid }) => {
     console.log('22');
     if (valid) {
-
       isFetching.value = true;
       try {
         await axios.put(`/candidates/${props.candidateId}`, {
@@ -60,16 +59,16 @@ const onFormSubmit = () => {
           languages: Array.from(languages.value),
         });
 
+        toast('Успешно', {
+          theme: 'auto',
+          type: 'success',
+          dangerouslyHTMLString: true,
+        });
         // Убедитесь, что fetchCandidates вызывается только после успешного обновления
         emit('fetchDatas');
         onFormCancel();
       } catch (error) {
         console.error('Ошибка при обновлении кандидата:', error);
-        toast(error?.message, {
-          theme: 'auto',
-          type: 'error',
-          dangerouslyHTMLString: true,
-        });
       } finally {
         isFetching.value = false;
       }
@@ -115,11 +114,7 @@ const fetchLanguages = async function () {
     const response = await axios.get('/languages');
     languages_list.value = response.data;
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   }
 };
 

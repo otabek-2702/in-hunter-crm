@@ -1,17 +1,18 @@
 import axios from 'axios'
 import router from "@/router"
+import { toast } from 'vue3-toastify';
 
 
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
 
 
 const axiosIns = axios.create({
-// You can add your headers here
-// ================================
+  // You can add your headers here
+  // ================================
   baseURL: import.meta.env.VITE_BASE_URL,
 
-// timeout: 1000,
-// headers: {'X-Custom-Header': 'foobar'}
+  // timeout: 1000,
+  // headers: {'X-Custom-Header': 'foobar'}
 })
 
 
@@ -39,6 +40,13 @@ axiosIns.interceptors.response.use(response => {
   // Возвращаем ответ, если всё нормально
   return response
 }, error => {
+  if (error.response) {
+    toast(error?.message, {
+      theme: 'auto',
+      type: 'error',
+      dangerouslyHTMLString: true,
+    });
+  }
   if (error.response && error.response.status === 404) {
 
     // Redirect to the 404 page

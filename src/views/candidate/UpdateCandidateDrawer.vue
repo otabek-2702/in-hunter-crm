@@ -23,14 +23,14 @@ const emit = defineEmits(['update:isDrawerOpen', 'fetchDatas']);
 const isFormValid = ref(false);
 const isFetching = ref(false);
 const refForm = ref();
-const full_name = ref('');
-const phone_number = ref('');
-const age = ref('');
-const address = ref('');
+const full_name = ref();
+const phone_number = ref();
+const age = ref();
+const address = ref();
 const gender = ref('man');
-const positive_skills = ref('');
-const apps_text = ref('');
-const apps = ref('');
+const positive_skills = ref();
+const apps_text = ref();
+const apps = ref();
 const languages = ref([]);
 
 // 👉 drawer close
@@ -59,6 +59,11 @@ const onSubmit = () => {
           languages: Array.from(languages.value),
         });
 
+        toast('Успешно', {
+          theme: 'auto',
+          type: 'success',
+          dangerouslyHTMLString: true,
+        });
         // Убедитесь, что fetchCandidates вызывается только после успешного обновления
         emit('fetchDatas');
         emit('update:isDrawerOpen', false);
@@ -68,11 +73,6 @@ const onSubmit = () => {
         });
       } catch (error) {
         console.error('Ошибка при обновлении кандидата:', error);
-        toast(error?.message, {
-          theme: 'auto',
-          type: 'error',
-          dangerouslyHTMLString: true,
-        });
       } finally {
         isFetching.value = true;
       }
@@ -82,6 +82,12 @@ const onSubmit = () => {
 
 const handleDrawerModelValueUpdate = (val) => {
   emit('update:isDrawerOpen', val);
+  if (!val) {
+    nextTick(() => {
+      refForm.value?.reset();
+      refForm.value?.resetValidation();
+    });
+  }
 };
 
 const fetchLanguages = async function () {
@@ -89,11 +95,7 @@ const fetchLanguages = async function () {
     const response = await axios.get('/languages');
     languages_list.value = response.data;
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   }
 };
 

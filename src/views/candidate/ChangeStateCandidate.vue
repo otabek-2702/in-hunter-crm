@@ -24,7 +24,7 @@ const emit = defineEmits(['fetchDatas']);
 
 const isDialogVisible = ref(false);
 const isFetching = ref(false);
-const comment = ref('');
+const comment = ref();
 
 const onCancel = async () => {
   isFetching.value = true;
@@ -41,11 +41,7 @@ const onCancel = async () => {
     comment.value = '';
     isDialogVisible.value = false;
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   } finally {
     isFetching.value = false;
   }
@@ -66,11 +62,7 @@ const onBlock = async () => {
     comment.value = '';
     isDialogVisible.value = false;
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   } finally {
     isFetching.value = false;
   }
@@ -93,11 +85,7 @@ const onArchive = async () => {
     comment.value = '';
     isDialogVisible.value = false;
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   } finally {
     isFetching.value = false;
   }
@@ -109,16 +97,16 @@ const onNextState = async () => {
     await axios.post(`/candidates/${props.id}/update_state/invite_to_interview`, {
       comment: comment.value,
     });
-
+    
+    toast('Успешно обновлено', {
+      theme: 'auto',
+      type: 'success',
+      dangerouslyHTMLString: true,
+    });
     comment.value = '';
     isDialogVisible.value = false;
   } catch (error) {
     console.error('Ошибка :', error);
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
   } finally {
     isFetching.value = false;
   }

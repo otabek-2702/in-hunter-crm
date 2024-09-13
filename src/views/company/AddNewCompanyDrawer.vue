@@ -18,9 +18,9 @@ const emit = defineEmits(['update:isDrawerOpen', 'fetchDatas']);
 const isFetching = ref(false);
 const isFormValid = ref(false);
 const refForm = ref();
-const title = ref('');
-const phone_number = ref('');
-const description = ref('');
+const title = ref();
+const phone_number = ref();
+const description = ref();
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -43,16 +43,17 @@ const onSubmit = () => {
         });
 
         if (response.status == 201) {
+          toast('Успешно', {
+            theme: 'auto',
+            type: 'success',
+            dangerouslyHTMLString: true,
+          });
           emit('fetchDatas');
 
           closeNavigationDrawer();
         }
       } catch (error) {
-        toast(error?.message, {
-          theme: 'auto',
-          type: 'error',
-          dangerouslyHTMLString: true,
-        });
+        console.error('Ошибка:', error);
       } finally {
         isFetching.value = false;
       }
@@ -62,6 +63,12 @@ const onSubmit = () => {
 
 const handleDrawerModelValueUpdate = (val) => {
   emit('update:isDrawerOpen', val);
+  if (!val) {
+    nextTick(() => {
+      refForm.value?.reset();
+      refForm.value?.resetValidation();
+    });
+  }
 };
 </script>
 

@@ -5,7 +5,6 @@ import AddNewVacancyDrawer from '@/views/vacancy/AddNewVacancyDrawer.vue';
 import Skeleton from '@/views/skeleton/Skeleton.vue';
 import DeleteItemDialog from '@/@core/components/DeleteItemDialog.vue';
 import { VChip } from 'vuetify/components';
-import { toast } from 'vue3-toastify';
 
 const searchQuery = ref('');
 const rowPerPage = ref(10);
@@ -17,9 +16,9 @@ const vacancies = ref([]);
 const lastFetchedPage = ref(null);
 const isFetching = ref(false);
 // filter
-const selectedState = ref('');
-const selectedCompany = ref('');
-const selectedJobPosition = ref('');
+const selectedState = ref();
+const selectedCompany = ref();
+const selectedJobPosition = ref();
 
 const fetchData = async (force = false) => {
   isFetching.value = true;
@@ -40,8 +39,8 @@ const fetchData = async (force = false) => {
     totalElements.value = vacancies_r.data['meta']['total'];
     totalPage.value = vacancies_r.data['meta']['last_page'];
     rowPerPage.value = vacancies_r.data['meta']['per_page'];
-  } catch (e) {
-    console.error('Ошибка загрузки кандидатов:', e);
+  } catch (error) {
+    console.error('Ошибка загрузки кандидатов:', error);
   } finally {
     isFetching.value = false;
   }
@@ -65,11 +64,7 @@ const searchElements = async () => {
     totalPage.value = vacancies_r.data['meta']['last_page'];
     rowPerPage.value = vacancies_r.data['meta']['per_page'];
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   } finally {
     isFetching.value = false;
   }
@@ -117,11 +112,7 @@ const deleteItem = async function (id) {
     await fetchData(true);
     isDialogVisible.value = false;
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   } finally {
     isDeleting.value = false;
   }
@@ -136,11 +127,7 @@ const fetchStates = async () => {
     const response = await axios.get('/states');
     states_list.value = await response.data.states.filter((el) => el.table === 'vacancies');
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   }
 };
 watchEffect(fetchStates);
@@ -152,11 +139,7 @@ const fetchCompanies = async () => {
     const response = await axios.get('/companies');
     companies_list.value = await response.data.companies;
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   }
 };
 watchEffect(fetchCompanies);
@@ -168,11 +151,7 @@ const fetchJobPositions = async () => {
     const response = await axios.get('/job_positions');
     job_positions_list.value = await response.data.job_positions;
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   }
 };
 watchEffect(fetchJobPositions);

@@ -24,8 +24,8 @@ const errors = ref({
 })
 
 const refVForm = ref()
-const username = ref('')
-const password = ref('')
+const username = ref()
+const password = ref()
 const error = ref(false)
 
 const login = () => {

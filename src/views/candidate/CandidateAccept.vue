@@ -17,13 +17,13 @@ const emit = defineEmits(['fetchDatas']);
 
 const isDialogVisible = ref(false);
 const isFetching = ref(false);
-const comment = ref('');
-const selectedCompany = ref('');
-const selectedVacancy = ref('');
+const comment = ref();
+const selectedCompany = ref();
+const selectedVacancy = ref();
 
 const onFormCancel = () => {
-  isDialogVisible = false
-}
+  isDialogVisible = false;
+};
 
 const onSubmit = async () => {
   isFetching.value = true;
@@ -31,7 +31,7 @@ const onSubmit = async () => {
     await axios.post(`/candidates/${props.id}/update_state/accept`, {
       vacancy_id: selectedVacancy.value,
       company_id: selectedCompany.value,
-      comment:comment.value
+      comment: comment.value,
     });
 
     toast('Успешно обновлено', {
@@ -42,11 +42,7 @@ const onSubmit = async () => {
     comment.value = '';
     isDialogVisible.value = false;
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   } finally {
     isFetching.value = false;
   }
@@ -59,11 +55,7 @@ const fetchCompanies = async () => {
     const response = await axios.get('/companies');
     companies_list.value = await response.data.companies;
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   }
 };
 watchEffect(fetchCompanies);
@@ -73,20 +65,17 @@ const vacancies_list = ref([]);
 const fetchVacancies = async () => {
   try {
     const response = await axios.get(`/vacancies?company_id=${selectedCompany.value}`);
-    vacancies_list.value = await response.data.vacancies.map(el => ({id:el.id, job_position_name_ru: el.job_position.name_ru}));
+    vacancies_list.value = await response.data.vacancies.map((el) => ({
+      id: el.id,
+      job_position_name_ru: el.job_position.name_ru,
+    }));
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   }
 };
 watch(selectedCompany, (newVal) => {
   if (newVal) fetchVacancies();
 });
-
-
 </script>
 
 <template>
@@ -126,16 +115,16 @@ watch(selectedCompany, (newVal) => {
             />
           </VCol>
           <VCol cols="6">
-              <VSelect
+            <VSelect
               v-if="vacancies_list.length"
-                v-model="selectedVacancy"
-                label="Select Vacancy"
-                :items="vacancies_list"
-                item-title="job_position_name_ru"
-                item-value="id"
-                clearable
-                clear-icon="bx-x"
-              />
+              v-model="selectedVacancy"
+              label="Select Vacancy"
+              :items="vacancies_list"
+              item-title="job_position_name_ru"
+              item-value="id"
+              clearable
+              clear-icon="bx-x"
+            />
           </VCol>
           <!-- 👉 Submit and Cancel -->
           <VCol cols="12" class="d-flex flex-wrap justify-center gap-4">

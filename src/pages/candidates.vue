@@ -7,7 +7,6 @@ import ChangeStateCandidate from '@/views/candidate/ChangeStateCandidate.vue';
 import Skeleton from '@/views/skeleton/Skeleton.vue';
 import CandidateInfo from '@/views/candidate/CandidateInfo.vue';
 import CandidateAccept from '@/views/candidate/CandidateAccept.vue';
-import { toast } from 'vue3-toastify';
 
 const searchQuery = ref('');
 const rowPerPage = ref(10);
@@ -68,8 +67,8 @@ const fetchCandidates = async (force = false) => {
     rowPerPage.value = candidates_r.data['meta']['per_page'];
 
     filtersChanged.value = false; // Сбрасываем флаг изменений фильтров после загрузки
-  } catch (e) {
-    console.error('Ошибка загрузки кандидатов:', e);
+  } catch (error) {
+    console.error('Ошибка загрузки кандидатов:', error);
   } finally {
     isFetching.value = false;
   }
@@ -105,11 +104,7 @@ const fetchStates = async () => {
     const states_r = await axios.get(`/states`);
     states_list.value = states_r.data.states.filter((el) => el.table === 'candidates');
   } catch (error) {
-    toast(error?.message, {
-      theme: 'auto',
-      type: 'error',
-      dangerouslyHTMLString: true,
-    });
+    console.error('Ошибка :', error);
   }
 };
 
@@ -264,7 +259,7 @@ const isDialogVisible = ref(false);
                       !(
                         candidate.state.slug === 'cancel' ||
                         candidate.state.slug === 'block' ||
-                        candidate.state.slug === 'invite'||
+                        candidate.state.slug === 'invite' ||
                         candidate.state.slug === 'success'
                       )
                     "
