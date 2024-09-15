@@ -5,6 +5,7 @@ import AddNewVacancyDrawer from '@/views/vacancy/AddNewVacancyDrawer.vue';
 import Skeleton from '@/views/skeleton/Skeleton.vue';
 import DeleteItemDialog from '@/@core/components/DeleteItemDialog.vue';
 import { VChip } from 'vuetify/components';
+import { toast } from 'vue3-toastify';
 
 const searchQuery = ref();
 const finalSearch = ref('');
