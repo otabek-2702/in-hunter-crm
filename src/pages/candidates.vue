@@ -232,10 +232,15 @@ const handleCandidateOpen = (id) => {
               </tr>
             </thead>
 
-            <tbody v-show="!isFetching">
-              <tr v-for="candidate in candidates" :key="candidate.id">
+            <tbody>
+              <tr
+                @click="() => handleCandidateOpen(candidate.id)"
+                :style="{ cursor: 'pointer' }"
+                v-for="candidate in candidates"
+                :key="candidate.id"
+              >
                 <td>{{ candidate.id }}</td>
-                <td @click="() => handleCandidateOpen(candidate.id)" :style="{ cursor: 'pointer' }">
+                <td>
                   {{ candidate.full_name }}
                 </td>
                 <td>{{ candidate.age }}</td>
@@ -251,7 +256,7 @@ const handleCandidateOpen = (id) => {
                     {{ candidate.state.name_ru }}
                   </VChip>
                 </td>
-                <td class="text-center" style="width: 80px">
+                <td class="text-center" :style="{ width: '80px', zIndex: '10' }">
                   <VIcon
                     @click="
                       (event) => {
@@ -259,6 +264,7 @@ const handleCandidateOpen = (id) => {
                         openEditDrawer(candidate.id);
                       }
                     "
+                    v-if="!(candidate.state.slug === 'cancel' || candidate.state.slug === 'block')"
                     size="30"
                     icon="bx-edit-alt"
                     style="color: rgb(var(--v-global-theme-primary))"
@@ -287,9 +293,9 @@ const handleCandidateOpen = (id) => {
                 </td>
               </tr>
             </tbody>
-            <Skeleton :count="7" v-show="isFetching" />
+            <Skeleton :count="7" v-show="isFetching && !candidates.length" />
 
-            <tfoot v-show="!candidates.length">
+            <tfoot v-show="!isFetching && !candidates.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">No data available</td>
               </tr>

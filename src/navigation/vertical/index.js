@@ -1,7 +1,7 @@
 export default [
   {
     title: 'Statistics',
-    to: { name: 'Index' },
+    to: { name: 'Statistics' },
     icon: { icon: 'mdi-chart-areaspline' },
     subject: 'post',
     action: 'create'

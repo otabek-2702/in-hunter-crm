@@ -94,7 +94,7 @@ watch(
     @update:model-value="closeNavigationDrawer"
   >
     <!-- 👉 Title -->
-    <AppDrawerHeaderSection title="Update Employee" @cancel="closeNavigationDrawer" />
+    <AppDrawerHeaderSection title="Изменить" @cancel="closeNavigationDrawer" />
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
@@ -110,11 +110,11 @@ watch(
           >
             <VRow>
               <VCol cols="12">
-                <VTextField v-model="name_ru" :rules="[requiredValidator]" label="Title" />
+                <VTextField v-model="name_uz" :rules="[requiredValidator]" label="Name uz" />
               </VCol>
-
+              
               <VCol cols="12">
-                <VTextField v-model="name_uz" :rules="[requiredValidator]" label="Title" />
+                <VTextField v-model="name_ru" :rules="[requiredValidator]" label="Name ru" />
               </VCol>
 
               <!-- 👉 Submit and Cancel -->

@@ -265,7 +265,7 @@ const resolveVacancyState = (state) => {
               </tr>
             </thead>
 
-            <tbody v-show="!isFetching">
+            <tbody>
               <tr v-for="(vacancy, i) in vacancies" :key="i">
                 <td>{{ i + 1 }}</td>
                 <td>{{ vacancy?.company?.title }}</td>
@@ -291,7 +291,7 @@ const resolveVacancyState = (state) => {
               </tr>
             </tbody>
 
-            <Skeleton :count="5" v-show="isFetching" />
+            <Skeleton :count="5" v-show="isFetching && !vacancies.length" />
 
             <tfoot v-if="!isFetching && !vacancies.length">
               <tr>

@@ -5,6 +5,7 @@ import AddNewCompanyDrawer from '@/views/company/AddNewCompanyDrawer.vue';
 import UpdateCompanyDrawer from '@/views/company/UpdateCompanyDrawer.vue';
 import Skeleton from '@/views/skeleton/Skeleton.vue';
 import DeleteItemDialog from '@/@core/components/DeleteItemDialog.vue';
+import { toast } from 'vue3-toastify';
 
 const searchQuery = ref('');
 const finalSearch = ref('');
@@ -167,7 +168,7 @@ const deleteItem = async function (id) {
               </tr>
             </thead>
 
-            <tbody v-show="!isFetching">
+            <tbody>
               <tr v-for="(company, i) in companies" :key="i">
                 <td>{{ i + 1 }}</td>
                 <td>{{ company.title }}</td>
@@ -194,7 +195,7 @@ const deleteItem = async function (id) {
               </tr>
             </tbody>
 
-            <Skeleton :count="4" v-show="isFetching" />
+            <Skeleton :count="4" v-show="isFetching && !companies.length" />
 
             <tfoot v-if="!isFetching && !companies.length">
               <tr>

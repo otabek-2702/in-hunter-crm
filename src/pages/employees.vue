@@ -168,7 +168,7 @@ const deleteItem = async function (id) {
               </tr>
             </thead>
 
-            <tbody v-show="!isFetching">
+            <tbody>
               <tr v-for="(employee, i) in employees" :key="i">
                 <td>{{ i + 1 }}</td>
                 <td>{{ employee.name }}</td>
@@ -195,7 +195,7 @@ const deleteItem = async function (id) {
               </tr>
             </tbody>
 
-            <Skeleton :count="4" v-show="isFetching" />
+            <Skeleton :count="4" v-show="isFetching && !employees.length" />
 
             <tfoot v-if="!isFetching && !employees.length">
               <tr>

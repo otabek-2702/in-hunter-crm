@@ -79,7 +79,7 @@ const handleDrawerModelValueUpdate = (val) => {
     @update:model-value="handleDrawerModelValueUpdate"
   >
     <!-- 👉 Title -->
-    <AppDrawerHeaderSection title="Добавить новую работу" @cancel="closeNavigationDrawer" />
+    <AppDrawerHeaderSection title="Добавить новую" @cancel="closeNavigationDrawer" />
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
@@ -94,11 +94,11 @@ const handleDrawerModelValueUpdate = (val) => {
           >
             <VRow>
               <VCol cols="12">
-                <VTextField v-model="name_ru" :rules="[requiredValidator]" label="Title" />
+                <VTextField v-model="name_uz" :rules="[requiredValidator]" label="Name uz" />
               </VCol>
 
               <VCol cols="12">
-                <VTextField v-model="name_uz" :rules="[requiredValidator]" label="Title" />
+                <VTextField v-model="name_ru" :rules="[requiredValidator]" label="Name ru" />
               </VCol>
 
               <!-- 👉 Submit and Cancel -->

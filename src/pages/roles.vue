@@ -216,7 +216,7 @@ const deleteItem = async function (id) {
             </thead>
 
             <!-- 👉 table body -->
-            <tbody v-show="!isFetching">
+            <tbody>
               <tr v-for="role in roles" :key="role.id">
                 <td class="text-capitalize text-high-emphasis">
                   <span class="text-base">{{ role.id }}</span>
@@ -248,7 +248,7 @@ const deleteItem = async function (id) {
                       @click="openEditDrawer(role.id)"
                       size="30"
                       icon="bx-edit-alt"
-                      style="color: rgb(var(--v-global-theme-primary)"
+                      style="color: rgb(var(--v-global-theme-primary))"
                     ></VIcon>
                     <VIcon
                       size="30"
@@ -261,10 +261,10 @@ const deleteItem = async function (id) {
               </tr>
             </tbody>
 
-            <Skeleton :count="4" v-show="isFetching" />
+            <Skeleton :count="4" v-show="isFetching && !roles.length" />
 
             <!-- 👉 table footer  -->
-            <tfoot v-if="!roles.length">
+            <tfoot v-if="isFetching && !roles.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">No data available</td>
               </tr>

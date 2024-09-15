@@ -74,7 +74,7 @@ const onSubmit = () => {
       } catch (error) {
         console.error('Ошибка при обновлении кандидата:', error);
       } finally {
-        isFetching.value = true;
+        isFetching.value = false;
       }
     }
   });

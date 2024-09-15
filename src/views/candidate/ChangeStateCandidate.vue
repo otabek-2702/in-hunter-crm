@@ -23,11 +23,14 @@ const props = defineProps({
 const emit = defineEmits(['fetchDatas']);
 
 const isDialogVisible = ref(false);
-const isFetching = ref(false);
+const isFetching1 = ref(false);
+const isFetching2 = ref(false);
+const isFetching3 = ref(false);
+const isFetching4 = ref(false);
 const comment = ref();
 
 const onCancel = async () => {
-  isFetching.value = true;
+  isFetching1.value = true;
   try {
     await axios.post(`/candidates/${props.id}/update_state/cancel`, {
       comment: comment.value,
@@ -44,12 +47,12 @@ const onCancel = async () => {
   } catch (error) {
     console.error('Ошибка :', error);
   } finally {
-    isFetching.value = false;
+    isFetching1.value = false;
   }
 };
 
 const onBlock = async () => {
-  isFetching.value = true;
+  isFetching2.value = true;
   try {
     await axios.post(`/candidates/${props.id}/update_state/block`, {
       comment: comment.value,
@@ -66,13 +69,12 @@ const onBlock = async () => {
   } catch (error) {
     console.error('Ошибка :', error);
   } finally {
-    isFetching.value = false;
+    isFetching2.value = false;
   }
 };
 
 const onArchive = async () => {
-  console.log(props.id);
-  isFetching.value = true;
+  isFetching3.value = true;
   try {
     let url = `/candidates/${props.id}/update_state/`;
     if (props.state_slug === 'archive') url = url + 'un_archive';
@@ -90,12 +92,12 @@ const onArchive = async () => {
   } catch (error) {
     console.error('Ошибка :', error);
   } finally {
-    isFetching.value = false;
+    isFetching3.value = false;
   }
 };
 
 const onNextState = async () => {
-  isFetching.value = true;
+  isFetching4.value = true;
   try {
     await axios.post(`/candidates/${props.id}/update_state/invite_to_interview`, {
       comment: comment.value,
@@ -112,7 +114,7 @@ const onNextState = async () => {
   } catch (error) {
     console.error('Ошибка :', error);
   } finally {
-    isFetching.value = false;
+    isFetching4.value = false;
   }
 };
 
@@ -145,25 +147,25 @@ const archiveLabel = computed(() => (props.state_slug === 'archive' ? 'Unarchive
             <VTextarea label="Comment" v-model="comment" />
           </VCol>
           <VCol cols="3" class="px-1">
-            <VBtn class="w-100" @click="onCancel">
+            <VBtn :loading="isFetching1" :disabled="(isFetching1 || isFetching2 || isFetching3 || isFetching4)" class="w-100" @click="onCancel">
               Bekor qilish
               <VIcon icon="bx-minus-circle" class="ml-1 mr-0" />
             </VBtn>
           </VCol>
           <VCol cols="3" class="px-1">
-            <VBtn class="w-100" color="error" @click="onBlock">
+            <VBtn :loading="isFetching2" :disabled="(isFetching1 || isFetching2 || isFetching3 || isFetching4)" class="w-100" color="error" @click="onBlock">
               Bloklash
               <VIcon icon="bx-block" class="ml-1 mr-0" />
             </VBtn>
           </VCol>
           <VCol cols="3" class="px-1">
-            <VBtn class="w-100" color="secondary" @click="onArchive">
+            <VBtn :loading="isFetching3" :disabled="(isFetching1 || isFetching2 || isFetching3 || isFetching4)" class="w-100" color="secondary" @click="onArchive">
               {{ archiveLabel }}
               <VIcon icon="bx-archive-in" class="ml-1 mr-0" />
             </VBtn>
           </VCol>
           <VCol cols="3" class="px-1" v-if="props.state_slug != 'archive'">
-            <VBtn class="w-100" color="success" @click="onNextState">
+            <VBtn :loading="isFetching4" :disabled="(isFetching1 || isFetching2 || isFetching3 || isFetching4)" class="w-100" color="success" @click="onNextState">
               Keyingi
               <VIcon icon="bx-right-arrow-alt" class="ml-1 mr-0" />
             </VBtn>

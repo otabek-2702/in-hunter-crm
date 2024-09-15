@@ -40,6 +40,15 @@ const router = createRouter({
           redirect: { name: 'Candidates' }
         },
         {
+          path: '/statistics',
+          name: 'Statistics',
+          component: () => import("@/pages/statistics.vue"),
+          meta: {
+            action: 'show',
+            subject: 'Statistics',
+          }
+        },
+        {
           path: '/roles',
           name: 'Roles',
           component: () => import("@/pages/roles.vue"),

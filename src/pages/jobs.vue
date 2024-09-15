@@ -6,6 +6,7 @@ import Skeleton from '@/views/skeleton/Skeleton.vue';
 import DeleteItemDialog from '@/@core/components/DeleteItemDialog.vue';
 import { VChip } from 'vuetify/components';
 import UpdateJobPositionDrawer from '@/views/job_position/UpdateJobPositionDrawer.vue';
+import { toast } from 'vue3-toastify';
 
 const searchQuery = ref('');
 const finalSearch = ref('');
@@ -235,7 +236,7 @@ const deleteItem = async function (id) {
             </VCol> -->
             <VSpacer />
 
-            <VCol cols="4" class="app-user-search-filter d-flex align-center">
+            <VCol cols="6" class="app-user-search-filter d-flex align-center">
               <VTextField
                 v-model="searchQuery"
                 @keyup.enter="searchElements"
@@ -243,7 +244,7 @@ const deleteItem = async function (id) {
                 density="compact"
                 class="me-6"
               />
-              <VBtn @click="isAddNewJobPositionDrawerVisible = true"> Add new Job </VBtn>
+              <VBtn @click="isAddNewJobPositionDrawerVisible = true"> Add new Job Position </VBtn>
             </VCol>
           </VCardText>
 
@@ -258,7 +259,7 @@ const deleteItem = async function (id) {
               </tr>
             </thead>
 
-            <tbody v-show="!isFetching">
+            <tbody>
               <tr v-for="(job_position, i) in job_positions" :key="i">
                 <td>{{ i + 1 }}</td>
                 <td>{{ job_position?.name_ru }}</td>

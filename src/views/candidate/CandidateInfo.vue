@@ -45,10 +45,12 @@ const onFormSubmit = () => {
   refForm.value.validate().then(async ({ valid }) => {
     if (valid) {
       isFetching.value = true;
+      
       try {
         await axios.put(`/candidates/${props.candidateId}`, {
           full_name: full_name.value,
           age: age.value,
+          // photo: photo.value,
           apps_text: apps_text.value,
           apps: apps.value,
           gender: gender.value,
@@ -58,7 +60,7 @@ const onFormSubmit = () => {
           languages: Array.from(languages.value),
         });
 
-        toast('Успешно удалено', {
+        toast('Успешно обновлено', {
           theme: 'auto',
           type: 'success',
           dangerouslyHTMLString: true,
@@ -74,6 +76,51 @@ const onFormSubmit = () => {
     }
   });
 };
+
+// const onFormSubmit = () => {
+//   refForm.value.validate().then(async ({ valid }) => {
+//     if (valid) {
+//       isFetching.value = true;
+      
+//       const formData = new FormData();
+//       formData.append('full_name', full_name.value);
+//       formData.append('age', age.value);
+//       formData.append('apps_text', apps_text.value);
+//       formData.append('apps', apps.value);
+//       formData.append('gender', gender.value);
+//       formData.append('phone_number', phone_number.value);
+//       formData.append('address', address.value);
+//       formData.append('positive_skills', positive_skills.value);
+//       formData.append('languages', JSON.stringify(Array.from(languages.value))); // Массив языков
+      
+//       // Добавляем фото только если оно выбрано
+//       if (photo.value && photo.value[0]) { 
+//         formData.append('photo', photo.value[0]);
+//       }
+      
+//       try {
+//         await axios.put(`/candidates/${props.candidateId}`, formData, {
+//           headers: {
+//             'Content-Type': 'multipart/form-data'
+//           }
+//         });
+
+//         toast('Успешно обновлено', {
+//           theme: 'auto',
+//           type: 'success',
+//           dangerouslyHTMLString: true,
+//         });
+//         emit('fetchDatas');
+//         onFormCancel();
+//       } catch (error) {
+//         console.error('Ошибка при обновлении кандидата:', error);
+//       } finally {
+//         isFetching.value = false;
+//       }
+//     }
+//   });
+// };
+
 
 const fetchData = async () => {
   try {
@@ -166,6 +213,7 @@ watchEffect(fetchLanguages);
                     alt="avatar"
                     :style="{ width: '100%', borderRadius: '5px' }"
                   />
+                  <VFileInput v-model="photo" accept="image/*" single-line show-size label="File input" />
                 </VCol>
 
                 <VCol cols="9">
@@ -214,11 +262,11 @@ watchEffect(fetchLanguages);
             </VCol>
 
             <VCol cols="6">
-              <VTextField v-model="apps_text" :rules="[requiredValidator]" label="Apps text" />
+              <VTextField v-model="apps_text"  label="Apps text" />
             </VCol>
 
             <VCol cols="6">
-              <VTextField v-model="apps" :rules="[requiredValidator]" label="Apps" />
+              <VTextField v-model="apps"  label="Apps" />
             </VCol>
 
             <VCol cols="6">

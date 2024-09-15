@@ -40,8 +40,8 @@ const onSubmit = async () => {
       type: 'success',
       dangerouslyHTMLString: true,
     });
-    emit('fetchDatas')
-    onFormCancel()
+    emit('fetchDatas');
+    onFormCancel();
   } catch (error) {
     console.error('Ошибка :', error);
   } finally {
@@ -68,17 +68,19 @@ const fetchVacancies = async () => {
     const response = await axios.get(`/vacancies?company_id=${selectedCompany.value}`);
     const vacancies = await response.data?.vacancies;
     if (vacancies.length) {
-      selectedVacancy.value = null
+      selectedVacancy.value = null;
       vacancies_list.value = vacancies?.map((el) => ({
         id: el.id,
         job_position_name_ru: el.job_position.name_ru,
       }));
     } else {
-      selectedVacancy.value = 0
-      vacancies_list.value = [{
-        id: 0,
-        job_position_name_ru: 'no vacancies found in this company',
-    }]
+      selectedVacancy.value = 0;
+      vacancies_list.value = [
+        {
+          id: 0,
+          job_position_name_ru: 'no vacancies found in this company',
+        },
+      ];
     }
   } catch (error) {
     console.error('Ошибка :', error);
@@ -87,6 +89,77 @@ const fetchVacancies = async () => {
 watch(selectedCompany, (newVal) => {
   if (newVal) fetchVacancies();
 });
+
+const isFetching1 = ref(false);
+const isFetching2 = ref(false);
+const isFetching3 = ref(false);
+
+const onCancel = async () => {
+  isFetching1.value = true;
+  try {
+    await axios.post(`/candidates/${props.id}/update_state/cancel`, {
+      comment: comment.value,
+    });
+
+    toast('Успешно обновлено', {
+      theme: 'auto',
+      type: 'success',
+      dangerouslyHTMLString: true,
+    });
+    emit('fetchDatas');
+    comment.value = '';
+    isDialogVisible.value = false;
+  } catch (error) {
+    console.error('Ошибка :', error);
+  } finally {
+    isFetching1.value = false;
+  }
+};
+
+const onBlock = async () => {
+  isFetching2.value = true;
+  try {
+    await axios.post(`/candidates/${props.id}/update_state/block`, {
+      comment: comment.value,
+    });
+
+    toast('Успешно обновлено', {
+      theme: 'auto',
+      type: 'success',
+      dangerouslyHTMLString: true,
+    });
+    emit('fetchDatas');
+    comment.value = '';
+    isDialogVisible.value = false;
+  } catch (error) {
+    console.error('Ошибка :', error);
+  } finally {
+    isFetching2.value = false;
+  }
+};
+
+const onArchive = async () => {
+  isFetching3.value = true;
+  try {
+    let url = `/candidates/${props.id}/update_state/`;
+    if (props.state_slug === 'archive') url = url + 'un_archive';
+    else url = url + 'archive';
+    await axios.post(url, { comment: comment.value });
+
+    toast('Успешно обновлено', {
+      theme: 'auto',
+      type: 'success',
+      dangerouslyHTMLString: true,
+    });
+    emit('fetchDatas');
+    comment.value = '';
+    isDialogVisible.value = false;
+  } catch (error) {
+    console.error('Ошибка :', error);
+  } finally {
+    isFetching3.value = false;
+  }
+};
 </script>
 
 <template>
@@ -138,11 +211,49 @@ watch(selectedCompany, (newVal) => {
               aria-selected="true"
             />
           </VCol>
-          <!-- 👉 Submit and Cancel -->
-          <VCol cols="12" class="d-flex flex-wrap justify-center gap-4">
-            <VBtn @click="onSubmit" :loading="isFetching" :disabled="isFetching"> Submit </VBtn>
 
-            <VBtn color="secondary" variant="tonal" @click="onFormCancel"> Cancel </VBtn>
+          <!-- 👉 Submit and Cancel -->
+
+          <VCol cols="3" class="px-1">
+            <VBtn
+              :loading="isFetching1"
+              :disabled="isFetching1 || isFetching2 || isFetching3"
+              class="w-100"
+              @click="onCancel"
+            >
+              Bekor qilish
+              <VIcon icon="bx-minus-circle" class="ml-1 mr-0" />
+            </VBtn>
+          </VCol>
+          <VCol cols="3" class="px-1">
+            <VBtn
+              :loading="isFetching2"
+              :disabled="isFetching1 || isFetching2 || isFetching3"
+              class="w-100"
+              color="error"
+              @click="onBlock"
+            >
+              Bloklash
+              <VIcon icon="bx-block" class="ml-1 mr-0" />
+            </VBtn>
+          </VCol>
+          <VCol cols="3" class="px-1">
+            <VBtn
+              :loading="isFetching3"
+              :disabled="isFetching1 || isFetching2 || isFetching3"
+              class="w-100"
+              color="secondary"
+              @click="onArchive"
+            >
+              Archive
+              <VIcon icon="bx-archive-in" class="ml-1 mr-0" />
+            </VBtn>
+          </VCol>
+          <VCol cols="3" class="px-1">
+            <VBtn @click="onSubmit" :loading="isFetching" :disabled="isFetching" class="w-100">
+              Submit
+              <VIcon icon="mdi-file-document-arrow-right-outline" class="ml-1 mr-0" />
+            </VBtn>
           </VCol>
         </VRow>
       </VCardText>
