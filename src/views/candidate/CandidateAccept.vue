@@ -101,7 +101,7 @@ watch(selectedCompany, (newVal) => {
           }
         "
         size="30"
-        icon="bx-comment"
+        icon="bx-check"
       ></VIcon>
     </template>
 

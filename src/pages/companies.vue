@@ -7,6 +7,8 @@ import Skeleton from '@/views/skeleton/Skeleton.vue';
 import DeleteItemDialog from '@/@core/components/DeleteItemDialog.vue';
 
 const searchQuery = ref('');
+const finalSearch = ref('');
+const isFetching = ref(false);
 const rowPerPage = ref(10);
 const currentPage = ref(1);
 const totalPage = ref(1);
@@ -15,7 +17,6 @@ const companies = ref([]);
 const updateID = ref(0);
 
 const lastFetchedPage = ref(null);
-const isFetching = ref(false);
 
 const fetchData = async (force = false) => {
   if (!force && (isFetching.value || currentPage.value === lastFetchedPage.value)) {
@@ -25,7 +26,9 @@ const fetchData = async (force = false) => {
   isFetching.value = true;
 
   try {
-    const companies_r = await axios.get(`/companies?page=${currentPage.value}`);
+    const companies_r = await axios.get(
+      `/companies?page=${currentPage.value}&search=${finalSearch.value}`,
+    );
 
     companies.value = companies_r.data['companies'];
     lastFetchedPage.value = currentPage.value; // Сохраняем последнюю загруженную страницу
@@ -47,17 +50,24 @@ watch(currentPage, () => {
   }
 });
 
-const searchEmployees = async () => {
-  const companies_r = await axios.get('/companies?search=' + searchQuery.value);
-  companies.value = companies_r.data['companies'];
-
-  currentPage.value = companies_r.data['meta']['current_page'];
-  totalEmployees.value = companies_r.data['meta']['total'];
-  totalPage.value = companies_r.data['meta']['last_page'];
-  rowPerPage.value = companies_r.data['meta']['per_page'];
+// search
+const searchElements = async () => {
+  finalSearch.value = searchQuery.value;
+  currentPage.value = 1;
+  fetchData(true);
 };
 
-watchEffect(fetchData);
+watch(searchQuery, (newVal) => {
+  if (!newVal) {
+    finalSearch.value = '';
+    currentPage.value = 1;
+    fetchData(true);
+  }
+});
+
+onMounted(() => {
+  fetchData();
+});
 
 const isAddNewCompanyDrawerVisible = ref(false);
 const isUpdateCompanyDrawerVisible = ref(false);
@@ -102,6 +112,11 @@ const deleteItem = async function (id) {
   try {
     isDeleting.value = true;
     await axios.delete('/companies/' + id);
+    toast('Успешно удалено', {
+      theme: 'auto',
+      type: 'success',
+      dangerouslyHTMLString: true,
+    });
     await fetchData(true);
     isDialogVisible.value = false;
   } catch (error) {
@@ -131,7 +146,7 @@ const deleteItem = async function (id) {
             <VCol cols="6" class="app-user-search-filter d-flex align-center">
               <VTextField
                 v-model="searchQuery"
-                @keyup.enter="searchEmployees"
+                @keyup.enter="searchElements"
                 placeholder="Search Employee"
                 density="compact"
                 class="me-6"
@@ -152,7 +167,7 @@ const deleteItem = async function (id) {
               </tr>
             </thead>
 
-            <tbody>
+            <tbody v-show="!isFetching">
               <tr v-for="(company, i) in companies" :key="i">
                 <td>{{ i + 1 }}</td>
                 <td>{{ company.title }}</td>
@@ -179,9 +194,9 @@ const deleteItem = async function (id) {
               </tr>
             </tbody>
 
-            <Skeleton :count="4" v-if="isFetching && !companies.length" />
+            <Skeleton :count="4" v-show="isFetching" />
 
-            <tfoot v-show="!isFetching && !companies.length">
+            <tfoot v-if="!isFetching && !companies.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">No data available</td>
               </tr>

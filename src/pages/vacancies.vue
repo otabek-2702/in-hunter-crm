@@ -6,7 +6,8 @@ import Skeleton from '@/views/skeleton/Skeleton.vue';
 import DeleteItemDialog from '@/@core/components/DeleteItemDialog.vue';
 import { VChip } from 'vuetify/components';
 
-const searchQuery = ref('');
+const searchQuery = ref();
+const finalSearch = ref('');
 const rowPerPage = ref(10);
 const currentPage = ref(1);
 const totalPage = ref(1);
@@ -15,30 +16,43 @@ const vacancies = ref([]);
 
 const lastFetchedPage = ref(null);
 const isFetching = ref(false);
+
 // filter
+const filtersChanged = ref(false);
 const selectedState = ref();
 const selectedCompany = ref();
 const selectedJobPosition = ref();
 
 const fetchData = async (force = false) => {
-  isFetching.value = true;
-  if (!force && (isFetching.value || currentPage.value === lastFetchedPage.value)) {
+  if (
+    !force &&
+    (isFetching.value || (currentPage.value === lastFetchedPage.value && !filtersChanged.value))
+  ) {
     return; // Если запрос уже выполняется или страница не изменилась и фильтры не изменялись
   }
-  const url = `/vacancies?page=${currentPage.value}`;
-  if (selectedState.value) url = url + '&state_id=' + selectedState.value;
-  if (selectedJobPosition.value) url = url + '&job_position_id=$' + selectedJobPosition.value;
-  if (selectedCompany.value) url = url + '&company_id=' + selectedCompany.value;
+  isFetching.value = true;
+
+  let url = `/vacancies?page=${currentPage.value}&search=${finalSearch.value}`;
+  if (selectedState.value) {
+    url += `&state_id=${selectedState.value}`;
+  }
+  if (selectedJobPosition.value) {
+    url += `&job_position_id=${selectedJobPosition.value}`;
+  }
+  if (selectedCompany.value) {
+    url += `&company_id=${selectedCompany.value}`;
+  }
 
   try {
     const vacancies_r = await axios.get(url);
 
     vacancies.value = vacancies_r.data['vacancies'];
-    lastFetchedPage.value = currentPage.value; // Сохраняем последнюю загруженную страницу
+    lastFetchedPage.value = currentPage.value;
     currentPage.value = vacancies_r.data['meta']['current_page'];
     totalElements.value = vacancies_r.data['meta']['total'];
     totalPage.value = vacancies_r.data['meta']['last_page'];
     rowPerPage.value = vacancies_r.data['meta']['per_page'];
+    filtersChanged.value = false;
   } catch (error) {
     console.error('Ошибка загрузки кандидатов:', error);
   } finally {
@@ -46,31 +60,28 @@ const fetchData = async (force = false) => {
   }
 };
 
-// 👉 watching current page
-watch(currentPage, () => {
-  if (!isFetching.value) {
-    fetchData();
-  }
+// 👉 watching selected filters
+watch([selectedState, selectedJobPosition, selectedCompany], () => {
+  // Сбрасываем на первую страницу при изменении фильтров
+  filtersChanged.value = true; // Устанавливаем флаг, что фильтры изменились
+  currentPage.value = 1;
+  fetchData(true);
 });
 
+// search
 const searchElements = async () => {
-  try {
-    isFetching.value = true;
-    const vacancies_r = await axios.get('/vacancies?search=' + searchQuery.value);
-
-    vacancies.value = vacancies_r.data['vacancies'];
-    currentPage.value = vacancies_r.data['meta']['current_page'];
-    totalElements.value = vacancies_r.data['meta']['total'];
-    totalPage.value = vacancies_r.data['meta']['last_page'];
-    rowPerPage.value = vacancies_r.data['meta']['per_page'];
-  } catch (error) {
-    console.error('Ошибка :', error);
-  } finally {
-    isFetching.value = false;
-  }
+  finalSearch.value = searchQuery.value;
+  currentPage.value = 1;
+  fetchData(true);
 };
 
-watchEffect(fetchData);
+watch(searchQuery, (newVal) => {
+  if (!newVal) {
+    finalSearch.value = '';
+    currentPage.value = 1;
+    fetchData(true);
+  }
+});
 
 const isAddNewVacancyDrawerVisible = ref(false);
 
@@ -109,6 +120,11 @@ const deleteItem = async function (id) {
   try {
     isDeleting.value = true;
     await axios.delete('/vacancies/' + id);
+    toast('Успешно удалено', {
+      theme: 'auto',
+      type: 'success',
+      dangerouslyHTMLString: true,
+    });
     await fetchData(true);
     isDialogVisible.value = false;
   } catch (error) {
@@ -130,7 +146,6 @@ const fetchStates = async () => {
     console.error('Ошибка :', error);
   }
 };
-watchEffect(fetchStates);
 
 const companies_list = ref([]);
 
@@ -142,7 +157,6 @@ const fetchCompanies = async () => {
     console.error('Ошибка :', error);
   }
 };
-watchEffect(fetchCompanies);
 
 const job_positions_list = ref([]);
 
@@ -154,7 +168,13 @@ const fetchJobPositions = async () => {
     console.error('Ошибка :', error);
   }
 };
-watchEffect(fetchJobPositions);
+
+onMounted(() => {
+  fetchData();
+  fetchStates();
+  fetchCompanies();
+  fetchJobPositions();
+});
 
 // State
 const resolveVacancyState = (state) => {
@@ -245,7 +265,7 @@ const resolveVacancyState = (state) => {
               </tr>
             </thead>
 
-            <tbody v-if="vacancies.length">
+            <tbody v-show="!isFetching">
               <tr v-for="(vacancy, i) in vacancies" :key="i">
                 <td>{{ i + 1 }}</td>
                 <td>{{ vacancy?.company?.title }}</td>
@@ -271,9 +291,9 @@ const resolveVacancyState = (state) => {
               </tr>
             </tbody>
 
-            <Skeleton :count="5" v-else-if="isFetching && !vacancies.length" />
+            <Skeleton :count="5" v-show="isFetching" />
 
-            <tfoot v-else-if="!isFetching && !vacancies.length">
+            <tfoot v-if="!isFetching && !vacancies.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">No data available</td>
               </tr>

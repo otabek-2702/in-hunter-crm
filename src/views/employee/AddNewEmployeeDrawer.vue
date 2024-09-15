@@ -13,7 +13,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:isDrawerOpen', 'fetchEmployees']);
+const emit = defineEmits(['update:isDrawerOpen', 'fetchDatas']);
 
 const isFetching = ref(false);
 const isFormValid = ref(false);
@@ -46,7 +46,7 @@ const onSubmit = () => {
         });
 
         if (response.status == 201) {
-          emit('fetchEmployees');
+          emit('fetchDatas');
 
           closeNavigationDrawer();
         }

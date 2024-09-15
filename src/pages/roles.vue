@@ -5,9 +5,11 @@ import axios from '@axios';
 import AddNewRoleDrawer from '@/views/role/AddNewRoleDrawer.vue';
 import UpdateRoleDrawer from '@/views/role/UpdateRoleDrawer.vue';
 import DeleteItemDialog from '@core/components/DeleteItemDialog.vue';
-import { id } from 'vuetify/locale';
+import Skeleton from '@/views/skeleton/Skeleton.vue';
 
 const searchQuery = ref('');
+const finalSearch = ref('');
+const isFetching = ref(false);
 const rowPerPage = ref(10);
 const currentPage = ref(1);
 const totalPage = ref(1);
@@ -15,27 +17,40 @@ const totalRoles = ref(0);
 const roles = ref([]);
 const updateID = ref(0);
 
-const fetchRoles = async () => {
-  const roles_r = await axios.get('/roles?page=' + currentPage.value);
-  roles.value = await roles_r.data['roles'];
+const fetchData = async () => {
+  try {
+    isFetching.value = true;
+    const roles_r = await axios.get(`/roles?page=${currentPage.value}&search=${finalSearch.value}`);
+    roles.value = await roles_r.data['roles'];
 
-  currentPage.value = await roles_r.data['meta']['current_page'];
-  totalRoles.value = await roles_r.data['meta']['total'];
-  totalPage.value = await roles_r.data['meta']['last_page'];
-  rowPerPage.value = await roles_r.data['meta']['per_page'];
+    currentPage.value = await roles_r.data['meta']['current_page'];
+    totalRoles.value = await roles_r.data['meta']['total'];
+    totalPage.value = await roles_r.data['meta']['last_page'];
+    rowPerPage.value = await roles_r.data['meta']['per_page'];
+  } catch (error) {
+    console.error('Ошибка :', error);
+  } finally {
+    isFetching.value = false;
+  }
+};
+// search
+const searchElements = async () => {
+  finalSearch.value = searchQuery.value;
+  currentPage.value = 1;
+  fetchData(true);
 };
 
-const searchRoles = async () => {
-  const roles_r = await axios.get('/roles?search=' + searchQuery.value);
-  roles.value = await roles_r.data['roles'];
+watch(searchQuery, (newVal) => {
+  if (!newVal) {
+    finalSearch.value = '';
+    currentPage.value = 1;
+    fetchData(true);
+  }
+});
 
-  currentPage.value = await roles_r.data['meta']['current_page'];
-  totalRoles.value = await roles_r.data['meta']['total'];
-  totalPage.value = await roles_r.data['meta']['last_page'];
-  rowPerPage.value = await roles_r.data['meta']['per_page'];
-};
-
-watchEffect(fetchRoles);
+onMounted(() => {
+  fetchData();
+});
 
 // 👉 watching current page
 watchEffect(() => {
@@ -76,8 +91,6 @@ const resolveUserRoleVariant = (role) => {
   };
 };
 
-const isAddNewRoleDrawerVisible = ref(false);
-const isUpdateRoleDrawerVisible = ref(false);
 const roleData = ref({
   id: 1,
   name: null,
@@ -95,31 +108,35 @@ const paginationData = computed(() => {
   return `${firstIndex}-${lastIndex} of ${totalRoles.value}`;
 });
 
+// Add
+const isAddNewRoleDrawerVisible = ref(false);
 const addNewRole = async (roleData) => {
-  let { name_uz, name_ru, permission } = roleData;
+  let { name, name_uz, name_ru, permission } = roleData;
   try {
     await axios.post('/roles', {
-      name: name_uz,
+      name: name,
       name_uz: name_uz,
       name_ru: name_ru,
       permissions: Array.from(permission),
     });
-    await fetchRoles();
+    await fetchData();
   } catch (error) {
     console.error(error);
   }
 };
 
+// Update
+const isUpdateRoleDrawerVisible = ref(false);
 const updateRole = async (roleData) => {
-  let { name_uz, name_ru, permission, id } = roleData;
+  let { name, name_uz, name_ru, permission, id } = roleData;
   try {
     await axios.put('/roles/' + id, {
-      name: name_uz,
+      name: name,
       name_uz: name_uz,
       name_ru: name_ru,
       permissions: Array.from(permission),
     });
-    await fetchRoles();
+    await fetchData();
   } catch (error) {
     console.error(error);
   }
@@ -141,10 +158,15 @@ const isDialogVisible = ref(false);
 const deleteItem = async function (id) {
   try {
     await axios.delete('/roles/' + id);
-    await fetchRoles();
+    toast('Успешно удалено', {
+      theme: 'auto',
+      type: 'success',
+      dangerouslyHTMLString: true,
+    });
+    await fetchData();
     isDialogVisible.value = false;
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
 };
 </script>
@@ -169,7 +191,7 @@ const deleteItem = async function (id) {
               <!-- 👉 Search  -->
               <VTextField
                 v-model="searchQuery"
-                @keyup.enter="searchRoles"
+                @keyup.enter="searchElements"
                 placeholder="Search Role"
                 density="compact"
                 class="me-3"
@@ -194,7 +216,7 @@ const deleteItem = async function (id) {
             </thead>
 
             <!-- 👉 table body -->
-            <tbody>
+            <tbody v-show="!isFetching">
               <tr v-for="role in roles" :key="role.id">
                 <td class="text-capitalize text-high-emphasis">
                   <span class="text-base">{{ role.id }}</span>
@@ -239,8 +261,10 @@ const deleteItem = async function (id) {
               </tr>
             </tbody>
 
+            <Skeleton :count="4" v-show="isFetching" />
+
             <!-- 👉 table footer  -->
-            <tfoot v-show="!roles.length">
+            <tfoot v-if="!roles.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">No data available</td>
               </tr>

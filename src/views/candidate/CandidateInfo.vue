@@ -19,6 +19,7 @@ const emit = defineEmits(['update:isDrawerOpen, fetchDatas']);
 
 const refForm = ref();
 const isFetching = ref(false);
+const isFetchingStart = ref(true);
 const languages_list = ref([]);
 const full_name = ref();
 const phone_number = ref();
@@ -41,9 +42,7 @@ const onFormCancel = () => {
 };
 
 const onFormSubmit = () => {
-  console.log('11');
   refForm.value.validate().then(async ({ valid }) => {
-    console.log('22');
     if (valid) {
       isFetching.value = true;
       try {
@@ -59,7 +58,7 @@ const onFormSubmit = () => {
           languages: Array.from(languages.value),
         });
 
-        toast('Успешно', {
+        toast('Успешно удалено', {
           theme: 'auto',
           type: 'success',
           dangerouslyHTMLString: true,
@@ -77,22 +76,30 @@ const onFormSubmit = () => {
 };
 
 const fetchData = async () => {
-  let candidate = await axios.get('/candidates/' + props.candidateId);
+  try {
+    isFetchingStart.value = true;
 
-  full_name.value = candidate.data.full_name;
-  address.value = candidate.data.address;
-  gender.value = candidate.data.gender_slug;
-  age.value = candidate.data.age;
-  phone_number.value = candidate.data.phone_number;
-  positive_skills.value = candidate.data.positive_skills;
-  apps.value = candidate.data.apps;
-  photo.value = candidate.data.photo;
-  apps_text.value = candidate.data.apps_text;
+    let candidate = await axios.get('/candidates/' + props.candidateId);
 
-  languages.value = candidate.data.languages
-    .split(',') // Разбиваем строку по запятой
-    .filter(Boolean)
-    .map(Number);
+    full_name.value = candidate.data.full_name;
+    address.value = candidate.data.address;
+    gender.value = candidate.data.gender_slug;
+    age.value = candidate.data.age;
+    phone_number.value = candidate.data.phone_number;
+    positive_skills.value = candidate.data.positive_skills;
+    apps.value = candidate.data.apps;
+    photo.value = candidate.data.photo;
+    apps_text.value = candidate.data.apps_text;
+
+    languages.value = candidate.data.languages
+      .split(',') // Разбиваем строку по запятой
+      .filter(Boolean)
+      .map(Number);
+  } catch (error) {
+    console.log('Ошибка', error);
+  } finally {
+    isFetchingStart.value = false;
+  }
 };
 
 watch(
@@ -135,9 +142,20 @@ watchEffect(fetchLanguages);
         <VCardTitle class="text-h5">User Information </VCardTitle>
       </VCardItem>
 
+      <!-- Loader -->
+      <div v-if="isFetchingStart" class="d-flex h-screen align-center justify-center">
+        <VProgressCircular color="primary" indeterminate></VProgressCircular>
+      </div>
+
       <VCardText>
         <!-- 👉 Form -->
-        <VForm class="mt-6" ref="refForm" @submit.prevent="onFormSubmit">
+        <VForm
+          class="mt-6"
+          ref="refForm"
+          @submit.prevent="onFormSubmit"
+          :disabled="isFetching"
+          v-if="!isFetchingStart"
+        >
           <VRow>
             <!-- 👉 Full Name -->
             <VCol cols="12">

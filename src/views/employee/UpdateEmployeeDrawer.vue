@@ -17,7 +17,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:isDrawerOpen', 'fetchEmployees']);
+const emit = defineEmits(['update:isDrawerOpen', 'fetchDatas']);
 const isFetching = ref(false);
 const isFormValid = ref(false);
 const refForm = ref();
@@ -52,7 +52,7 @@ const onSubmit = () => {
         const response = await axios.patch(`/users/${props.id}`, body);
 
         if (response.status == 200) {
-          emit('fetchEmployees');
+          emit('fetchDatas');
 
           toast('Успешно', {
             theme: 'auto',

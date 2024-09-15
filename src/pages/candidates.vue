@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch, watchEffect } from 'vue';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import axios from '@axios';
 import AddNewCandidateDrawer from '@/views/candidate/AddNewCandidateDrawer.vue';
 import UpdateCandidateDrawer from '@/views/candidate/UpdateCandidateDrawer.vue';
@@ -9,6 +9,7 @@ import CandidateInfo from '@/views/candidate/CandidateInfo.vue';
 import CandidateAccept from '@/views/candidate/CandidateAccept.vue';
 
 const searchQuery = ref('');
+const finalSearch = ref('');
 const rowPerPage = ref(10);
 const currentPage = ref(1);
 const totalPage = ref(1);
@@ -31,12 +32,12 @@ const gender_list = ref([
   },
 ]);
 
+// Get main datas start
 const lastFetchedPage = ref(null);
 const isFetching = ref(false);
 const filtersChanged = ref(false);
 
-const fetchCandidates = async (force = false) => {
-  isFetching.value = true;
+const fetchData = async (force = false) => {
   if (
     !force &&
     (isFetching.value || (currentPage.value === lastFetchedPage.value && !filtersChanged.value))
@@ -57,10 +58,12 @@ const fetchCandidates = async (force = false) => {
   }
 
   try {
-    const candidates_r = await axios.get(`/candidates?page=${currentPage.value}${g}${state}`);
+    const candidates_r = await axios.get(
+      `/candidates?page=${currentPage.value}${g}${state}&search=${finalSearch.value}`,
+    );
 
     candidates.value = candidates_r.data['candidates'];
-    lastFetchedPage.value = currentPage.value; 
+    lastFetchedPage.value = currentPage.value;
     currentPage.value = candidates_r.data['meta']['current_page'];
     totalCandidates.value = candidates_r.data['meta']['total'];
     totalPage.value = candidates_r.data['meta']['last_page'];
@@ -77,27 +80,34 @@ const fetchCandidates = async (force = false) => {
 // 👉 watching current page
 watch(currentPage, () => {
   if (!isFetching.value) {
-    fetchCandidates();
+    fetchData();
   }
 });
+
+// Get main datas end
 
 // 👉 watching selected filters
 watch([selectedState, selectedGender], () => {
   // Сбрасываем на первую страницу при изменении фильтров
   filtersChanged.value = true; // Устанавливаем флаг, что фильтры изменились
   currentPage.value = 1;
-  fetchCandidates();
+  fetchData(true);
 });
 
-const searchCandidates = async () => {
-  const candidates_r = await axios.get('/candidates?search=' + searchQuery.value);
-  candidates.value = candidates_r.data['candidates'];
-
-  currentPage.value = candidates_r.data['meta']['current_page'];
-  totalCandidates.value = candidates_r.data['meta']['total'];
-  totalPage.value = candidates_r.data['meta']['last_page'];
-  rowPerPage.value = candidates_r.data['meta']['per_page'];
+// search
+const searchElements = () => {
+  finalSearch.value = searchQuery.value;
+  currentPage.value = 1;
+  fetchData(true);
 };
+
+watch(searchQuery, (newVal) => {
+  if (!newVal) {
+    finalSearch.value = '';
+    currentPage.value = 1;
+    fetchData(true);
+  }
+});
 
 const fetchStates = async () => {
   try {
@@ -108,8 +118,10 @@ const fetchStates = async () => {
   }
 };
 
-watchEffect(fetchCandidates);
-watchEffect(fetchStates);
+onMounted(() => {
+  fetchData();
+  fetchStates();
+});
 
 const resolveUserRoleVariant = (state) => {
   const roleLowerCase = state.toLowerCase();
@@ -142,6 +154,7 @@ const paginationData = computed(() => {
   return `${firstIndex}-${lastIndex} of ${totalCandidates.value}`;
 });
 
+// Edit
 const openEditDrawer = (id) => {
   updateID.value = id;
   isUpdateCandidateDrawerVisible.value = true;
@@ -150,12 +163,9 @@ const openEditDrawer = (id) => {
 const candidateViewId = ref(0);
 
 const handleCandidateOpen = (id) => {
-  console.log(id);
   candidateViewId.value = id;
   isCandidateInfoDialogVisible.value = true;
 };
-
-const isDialogVisible = ref(false);
 </script>
 
 <template>
@@ -196,7 +206,7 @@ const isDialogVisible = ref(false);
             <VCol cols="6" class="app-user-search-filter d-flex align-center">
               <VTextField
                 v-model="searchQuery"
-                @keyup.enter="searchCandidates"
+                @keyup.enter="searchElements"
                 placeholder="Search Candidate"
                 density="compact"
                 class="me-6"
@@ -222,7 +232,7 @@ const isDialogVisible = ref(false);
               </tr>
             </thead>
 
-            <tbody v-show="candidates.length">
+            <tbody v-show="!isFetching">
               <tr v-for="candidate in candidates" :key="candidate.id">
                 <td>{{ candidate.id }}</td>
                 <td @click="() => handleCandidateOpen(candidate.id)" :style="{ cursor: 'pointer' }">
@@ -263,22 +273,21 @@ const isDialogVisible = ref(false);
                         candidate.state.slug === 'success'
                       )
                     "
-                    @fetchDatas="() => fetchCandidates(true)"
+                    @fetchDatas="() => fetchData(true)"
                     :isDialogVisible="true"
                     :id="candidate.id"
                     :state_slug="candidate.state.slug"
                   />
                   <CandidateAccept
                     v-if="candidate.state.slug === 'invite'"
-                    />
-
+                    @fetchDatas="() => fetchData(true)"
                     :isDialogVisible="true"
                     :id="candidate.id"
                   />
                 </td>
               </tr>
             </tbody>
-            <Skeleton :count="7" v-if="isFetching && !candidates.length" />
+            <Skeleton :count="7" v-show="isFetching" />
 
             <tfoot v-show="!candidates.length">
               <tr>
@@ -308,18 +317,18 @@ const isDialogVisible = ref(false);
 
     <AddNewCandidateDrawer
       v-model:isDrawerOpen="isAddNewCandidateDrawerVisible"
-      @fetchDatas="() => fetchCandidates(true)"
+      @fetchDatas="() => fetchData(true)"
     />
     <UpdateCandidateDrawer
       :id="updateID"
       v-model:isDrawerOpen="isUpdateCandidateDrawerVisible"
-      @fetchDatas="() => fetchCandidates(true)"
+      @fetchDatas="() => fetchData(true)"
     />
 
     <CandidateInfo
       v-model:isDrawerOpen="isCandidateInfoDialogVisible"
       :candidateId="candidateViewId"
-      @fetchDatas="() => fetchCandidates(true)"
+      @fetchDatas="() => fetchData(true)"
     />
   </section>
 </template>

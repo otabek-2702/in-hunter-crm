@@ -8,6 +8,7 @@ import { VChip } from 'vuetify/components';
 import UpdateJobPositionDrawer from '@/views/job_position/UpdateJobPositionDrawer.vue';
 
 const searchQuery = ref('');
+const finalSearch = ref('');
 const rowPerPage = ref(10);
 const currentPage = ref(1);
 const totalPage = ref(1);
@@ -23,13 +24,15 @@ const isFetching = ref(false);
 // const selectedJobPosition = ref();
 
 const fetchData = async (force = false) => {
-  isFetching.value = true;
   if (!force && (isFetching.value || currentPage.value === lastFetchedPage.value)) {
     return; // Если запрос уже выполняется или страница не изменилась и фильтры не изменялись
   }
+  isFetching.value = true;
 
   try {
-    const job_positions_r = await axios.get(`/job_positions?page=${currentPage.value}`);
+    const job_positions_r = await axios.get(
+      `/job_positions?page=${currentPage.value}&search=${finalSearch.value}`,
+    );
 
     job_positions.value = job_positions_r.data['job_positions'];
     lastFetchedPage.value = currentPage.value; // Сохраняем последнюю загруженную страницу
@@ -51,27 +54,24 @@ watch(currentPage, () => {
   }
 });
 
+// search
 const searchElements = async () => {
-  try {
-    isFetching.value = true;
-    const job_positions_r = await axios.get('/job_positions?search=' + searchQuery.value);
-
-    job_positions.value = job_positions_r.data['job_positions'];
-    currentPage.value = job_positions_r.data['meta']['current_page'];
-    totalElements.value = job_positions_r.data['meta']['total'];
-    totalPage.value = job_positions_r.data['meta']['last_page'];
-    rowPerPage.value = job_positions_r.data['meta']['per_page'];
-  } catch (error) {
-    console.error('Ошибка :', error);
-  } finally {
-    isFetching.value = false;
-  }
+  finalSearch.value = searchQuery.value;
+  currentPage.value = 1;
+  fetchData(true);
 };
 
-watchEffect(fetchData);
+watch(searchQuery, (newVal) => {
+  if (!newVal) {
+    finalSearch.value = '';
+    currentPage.value = 1;
+    fetchData(true);
+  }
+});
 
-const isAddNewJobPositionDrawerVisible = ref(false);
-const isUpdateJobPositionDrawerVisible = ref(false);
+onMounted(() => {
+  fetchData();
+});
 
 // Pages start
 
@@ -91,6 +91,10 @@ const paginationData = computed(() => {
 });
 
 // Pages end
+
+// Edit
+const isAddNewJobPositionDrawerVisible = ref(false);
+const isUpdateJobPositionDrawerVisible = ref(false);
 
 const openEditDrawer = (id) => {
   updateID.value = id;
@@ -115,6 +119,11 @@ const deleteItem = async function (id) {
   try {
     isDeleting.value = true;
     await axios.delete('/job_positions/' + id);
+    toast('Успешно удалено', {
+      theme: 'auto',
+      type: 'success',
+      dangerouslyHTMLString: true,
+    });
     await fetchData(true);
     isDialogVisible.value = false;
   } catch (error) {
@@ -249,7 +258,7 @@ const deleteItem = async function (id) {
               </tr>
             </thead>
 
-            <tbody v-if="job_positions.length">
+            <tbody v-show="!isFetching">
               <tr v-for="(job_position, i) in job_positions" :key="i">
                 <td>{{ i + 1 }}</td>
                 <td>{{ job_position?.name_ru }}</td>
@@ -276,9 +285,9 @@ const deleteItem = async function (id) {
               </tr>
             </tbody>
 
-            <Skeleton :count="4" v-else-if="isFetching && !job_positions.length" />
+            <Skeleton :count="3" v-show="isFetching && !job_positions.length" />
 
-            <tfoot v-else-if="!isFetching && !job_positions.length">
+            <tfoot v-if="!isFetching && !job_positions.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">No data available</td>
               </tr>

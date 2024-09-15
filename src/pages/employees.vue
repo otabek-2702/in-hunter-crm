@@ -5,8 +5,10 @@ import AddNewEmployeeDrawer from '@/views/employee/AddNewEmployeeDrawer.vue';
 import UpdateEmployeeDrawer from '@/views/employee/UpdateEmployeeDrawer.vue';
 import Skeleton from '@/views/skeleton/Skeleton.vue';
 import DeleteItemDialog from '@/@core/components/DeleteItemDialog.vue';
+import { toast } from 'vue3-toastify';
 
 const searchQuery = ref('');
+const finalSearch = ref('');
 const rowPerPage = ref(10);
 const currentPage = ref(1);
 const totalPage = ref(1);
@@ -17,7 +19,7 @@ const updateID = ref(0);
 const lastFetchedPage = ref(null);
 const isFetching = ref(false);
 
-const fetchEmployees = async (force = false) => {
+const fetchData = async (force = false) => {
   if (!force && (isFetching.value || currentPage.value === lastFetchedPage.value)) {
     return; // Если запрос уже выполняется или страница не изменилась и фильтры не изменялись
   }
@@ -25,7 +27,9 @@ const fetchEmployees = async (force = false) => {
   isFetching.value = true;
 
   try {
-    const employees_r = await axios.get(`/users?page=${currentPage.value}`);
+    const employees_r = await axios.get(
+      `/users?page=${currentPage.value}&search=${finalSearch.value}`,
+    );
 
     employees.value = employees_r.data['users'];
     lastFetchedPage.value = currentPage.value; // Сохраняем последнюю загруженную страницу
@@ -43,24 +47,28 @@ const fetchEmployees = async (force = false) => {
 // 👉 watching current page
 watch(currentPage, () => {
   if (!isFetching.value) {
-    fetchEmployees();
+    fetchData();
   }
 });
 
-const searchEmployees = async () => {
-  const employees_r = await axios.get('/users?search=' + searchQuery.value);
-  employees.value = employees_r.data['users'];
-
-  currentPage.value = employees_r.data['meta']['current_page'];
-  totalEmployees.value = employees_r.data['meta']['total'];
-  totalPage.value = employees_r.data['meta']['last_page'];
-  rowPerPage.value = employees_r.data['meta']['per_page'];
+// search
+const searchElements = async () => {
+  finalSearch.value = searchQuery.value;
+  currentPage.value = 1;
+  fetchData(true);
 };
 
-watchEffect(fetchEmployees);
+watch(searchQuery, (newVal) => {
+  if (!newVal) {
+    finalSearch.value = '';
+    currentPage.value = 1;
+    fetchData(true);
+  }
+});
 
-const isAddNewEmployeeDrawerVisible = ref(false);
-const isUpdateEmployeeDrawerVisible = ref(false);
+onMounted(() => {
+  fetchData();
+});
 
 // Pages start
 
@@ -84,17 +92,20 @@ const openEditDrawer = (id) => {
   isUpdateEmployeeDrawerVisible.value = true;
 };
 
+const isAddNewEmployeeDrawerVisible = ref(false);
+const isUpdateEmployeeDrawerVisible = ref(false);
+
 // Delete
 const isDialogVisible = ref(false);
 const isDeleting = ref(false);
-const roleData = ref({
+const deleteData = ref({
   id: 1,
   name: null,
 });
 
 const confirmDelete = function (id, name) {
-  roleData.value.id = id;
-  roleData.value.name = name;
+  deleteData.value.id = id;
+  deleteData.value.name = name;
   isDialogVisible.value = true;
 };
 
@@ -102,7 +113,12 @@ const deleteItem = async function (id) {
   try {
     isDeleting.value = true;
     await axios.delete('/users/' + id);
-    await fetchEmployees(true);
+    toast('Успешно удалено', {
+      theme: 'auto',
+      type: 'success',
+      dangerouslyHTMLString: true,
+    });
+    fetchData(true);
     isDialogVisible.value = false;
   } catch (error) {
     console.error('Ошибка :', error);
@@ -121,7 +137,7 @@ const deleteItem = async function (id) {
             @confirm="deleteItem"
             :isDialogVisible="isDialogVisible"
             @update:isDialogVisible="isDialogVisible = $event"
-            :role="roleData"
+            :role="deleteData"
             :isDeleting="isDeleting"
           />
 
@@ -131,7 +147,7 @@ const deleteItem = async function (id) {
             <VCol cols="6" class="app-user-search-filter d-flex align-center">
               <VTextField
                 v-model="searchQuery"
-                @keyup.enter="searchEmployees"
+                @keyup.enter="searchElements"
                 placeholder="Search Employee"
                 density="compact"
                 class="me-6"
@@ -152,7 +168,7 @@ const deleteItem = async function (id) {
               </tr>
             </thead>
 
-            <tbody>
+            <tbody v-show="!isFetching">
               <tr v-for="(employee, i) in employees" :key="i">
                 <td>{{ i + 1 }}</td>
                 <td>{{ employee.name }}</td>
@@ -179,9 +195,9 @@ const deleteItem = async function (id) {
               </tr>
             </tbody>
 
-            <Skeleton :count="4" v-if="isFetching && !employees.length" />
+            <Skeleton :count="4" v-show="isFetching" />
 
-            <tfoot v-show="!isFetching && !employees.length">
+            <tfoot v-if="!isFetching && !employees.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">No data available</td>
               </tr>
@@ -209,12 +225,12 @@ const deleteItem = async function (id) {
 
     <AddNewEmployeeDrawer
       v-model:isDrawerOpen="isAddNewEmployeeDrawerVisible"
-      @fetchEmployees="() => fetchEmployees(true)"
+      @fetchDatas="() => fetchData(true)"
     />
     <UpdateEmployeeDrawer
       :id="updateID"
       v-model:isDrawerOpen="isUpdateEmployeeDrawerVisible"
-      @fetchEmployees="() => fetchEmployees(true)"
+      @fetchDatas="() => fetchData(true)"
     />
   </section>
 </template>
