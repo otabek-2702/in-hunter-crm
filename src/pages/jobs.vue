@@ -82,7 +82,9 @@ watchEffect(() => {
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = job_positions?.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0;
+  const firstIndex = job_positions?.value.length
+    ? (currentPage.value - 1) * rowPerPage.value + 1
+    : 0;
   const lastIndex = job_positions?.value.length + (currentPage.value - 1) * rowPerPage.value;
 
   return `${firstIndex}-${lastIndex} of ${totalElements.value}`;
@@ -228,7 +230,7 @@ const deleteItem = async function (id) {
               <VTextField
                 v-model="searchQuery"
                 @keyup.enter="searchElements"
-                placeholder="Search JobPosition"
+                placeholder="Search Job"
                 density="compact"
                 class="me-6"
               />
@@ -251,7 +253,7 @@ const deleteItem = async function (id) {
               <tr v-for="(job_position, i) in job_positions" :key="i">
                 <td>{{ i + 1 }}</td>
                 <td>{{ job_position?.name_ru }}</td>
-      
+
                 <td class="text-center" style="width: 80px">
                   <VIcon
                     @click="
