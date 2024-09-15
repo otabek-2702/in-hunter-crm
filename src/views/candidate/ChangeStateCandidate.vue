@@ -38,6 +38,7 @@ const onCancel = async () => {
       type: 'success',
       dangerouslyHTMLString: true,
     });
+    emit('fetchDatas')
     comment.value = '';
     isDialogVisible.value = false;
   } catch (error) {
@@ -59,6 +60,7 @@ const onBlock = async () => {
       type: 'success',
       dangerouslyHTMLString: true,
     });
+    emit('fetchDatas')
     comment.value = '';
     isDialogVisible.value = false;
   } catch (error) {
@@ -82,6 +84,7 @@ const onArchive = async () => {
       type: 'success',
       dangerouslyHTMLString: true,
     });
+    emit('fetchDatas')
     comment.value = '';
     isDialogVisible.value = false;
   } catch (error) {
@@ -103,6 +106,7 @@ const onNextState = async () => {
       type: 'success',
       dangerouslyHTMLString: true,
     });
+    emit('fetchDatas')
     comment.value = '';
     isDialogVisible.value = false;
   } catch (error) {

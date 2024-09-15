@@ -17,7 +17,6 @@ const emit = defineEmits(['update:isDrawerOpen', 'fetchEmployees']);
 
 const isFetching = ref(false);
 const isFormValid = ref(false);
-const isValidLogin = ref(true);
 const refForm = ref();
 const roles_list = ref([]);
 const name = ref();
@@ -61,7 +60,6 @@ const onSubmit = () => {
         } else {
           console.error('Ошибка:', error);
         }
-        isValidLogin.value = false;
       }
     }
   });
@@ -118,7 +116,7 @@ watchEffect(fetchRoles);
               <VCol cols="12">
                 <VTextField
                   v-model="login"
-                  :rules="[requiredValidator, () => isValidLogin]"
+                  :rules="[requiredValidator]"
                   label="Login"
                 />
               </VCol>

@@ -60,7 +60,7 @@ const fetchCandidates = async (force = false) => {
     const candidates_r = await axios.get(`/candidates?page=${currentPage.value}${g}${state}`);
 
     candidates.value = candidates_r.data['candidates'];
-    lastFetchedPage.value = currentPage.value; // Сохраняем последнюю загруженную страницу
+    lastFetchedPage.value = currentPage.value; 
     currentPage.value = candidates_r.data['meta']['current_page'];
     totalCandidates.value = candidates_r.data['meta']['total'];
     totalPage.value = candidates_r.data['meta']['last_page'];
@@ -270,7 +270,8 @@ const isDialogVisible = ref(false);
                   />
                   <CandidateAccept
                     v-if="candidate.state.slug === 'invite'"
-                    @fetchDatas="() => fetchCandidates(true)"
+                    />
+
                     :isDialogVisible="true"
                     :id="candidate.id"
                   />

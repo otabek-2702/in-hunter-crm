@@ -22,7 +22,8 @@ const selectedCompany = ref();
 const selectedVacancy = ref();
 
 const onFormCancel = () => {
-  isDialogVisible = false;
+  comment.value = '';
+  isDialogVisible.value = false;
 };
 
 const onSubmit = async () => {
@@ -39,8 +40,8 @@ const onSubmit = async () => {
       type: 'success',
       dangerouslyHTMLString: true,
     });
-    comment.value = '';
-    isDialogVisible.value = false;
+    emit('fetchDatas')
+    onFormCancel()
   } catch (error) {
     console.error('Ошибка :', error);
   } finally {
@@ -65,10 +66,20 @@ const vacancies_list = ref([]);
 const fetchVacancies = async () => {
   try {
     const response = await axios.get(`/vacancies?company_id=${selectedCompany.value}`);
-    vacancies_list.value = await response.data.vacancies.map((el) => ({
-      id: el.id,
-      job_position_name_ru: el.job_position.name_ru,
-    }));
+    const vacancies = await response.data?.vacancies;
+    if (vacancies.length) {
+      selectedVacancy.value = null
+      vacancies_list.value = vacancies?.map((el) => ({
+        id: el.id,
+        job_position_name_ru: el.job_position.name_ru,
+      }));
+    } else {
+      selectedVacancy.value = 0
+      vacancies_list.value = [{
+        id: 0,
+        job_position_name_ru: 'no vacancies found in this company',
+    }]
+    }
   } catch (error) {
     console.error('Ошибка :', error);
   }
@@ -124,6 +135,7 @@ watch(selectedCompany, (newVal) => {
               item-value="id"
               clearable
               clear-icon="bx-x"
+              aria-selected="true"
             />
           </VCol>
           <!-- 👉 Submit and Cancel -->

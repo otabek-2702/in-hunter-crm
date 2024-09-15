@@ -22,31 +22,28 @@ const isFetching = ref(false);
 const isFetchingStart = ref(true);
 const isFormValid = ref(false);
 const refForm = ref();
-const title = ref();
-const phone_number = ref();
-const description = ref();
+const name_uz = ref();
+const name_ru = ref();
 
 // 👉 drawer close
-const closeNavigationDrawer = () => {
-  emit('update:isDrawerOpen', false);
+const closeNavigationDrawer = (val = false) => {
+  emit('update:isDrawerOpen', val);
   nextTick(() => {
     refForm.value?.reset();
     refForm.value?.resetValidation();
   });
 };
 const onSubmit = () => {
-  console.log(isFetching.value);
   refForm.value?.validate().then(async ({ valid }) => {
     if (valid) {
       isFetching.value = true;
       try {
         let body = {
-          title: title.value,
-          phone_number: phone_number.value,
-          description: description.value,
+          name_uz: name_uz.value,
+          name_ru: name_ru.value,
         };
 
-        const response = await axios.patch(`/companies/${props.id}`, body);
+        const response = await axios.patch(`/job_positions/${props.id}`, body);
         if (response.status == 200) {
           toast('Успешно', {
             theme: 'auto',
@@ -66,23 +63,14 @@ const onSubmit = () => {
   });
 };
 
-const handleDrawerModelValueUpdate = (val) => {
-  emit('update:isDrawerOpen', val);
-  if (!val) {
-    nextTick(() => {
-      refForm.value?.reset();
-      refForm.value?.resetValidation();
-    });
-  }
-};
+
 
 const fetchDataById = async () => {
   isFetchingStart.value = true;
   try {
-    const { data } = await axios.get(`/companies/${props.id}`);
-    title.value = data.title;
-    phone_number.value = data.phone_number;
-    description.value = data.description;
+    const { data } = await axios.get(`/job_positions/${props.id}`);
+    name_uz.value = data.name_uz;
+    name_ru.value = data.name_ru;
   } catch (error) {
     console.error('Ошибка:', error);
   } finally {
@@ -103,7 +91,7 @@ watch(
     location="end"
     class="scrollable-content"
     :model-value="props.isDrawerOpen"
-    @update:model-value="handleDrawerModelValueUpdate"
+    @update:model-value="closeNavigationDrawer"
   >
     <!-- 👉 Title -->
     <AppDrawerHeaderSection title="Update Employee" @cancel="closeNavigationDrawer" />
@@ -122,15 +110,11 @@ watch(
           >
             <VRow>
               <VCol cols="12">
-                <VTextField v-model="title" label="Title" />
+                <VTextField v-model="name_ru" :rules="[requiredValidator]" label="Title" />
               </VCol>
 
               <VCol cols="12">
-                <VTextField v-model="phone_number" label="Phone number" />
-              </VCol>
-
-              <VCol cols="12">
-                <VTextarea v-model="description" label="Description" />
+                <VTextField v-model="name_uz" :rules="[requiredValidator]" label="Title" />
               </VCol>
 
               <!-- 👉 Submit and Cancel -->

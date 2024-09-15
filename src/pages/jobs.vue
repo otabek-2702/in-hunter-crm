@@ -1,44 +1,42 @@
 <script setup>
 import { computed, ref, watch, watchEffect } from 'vue';
 import axios from '@axios';
-import AddNewVacancyDrawer from '@/views/vacancy/AddNewVacancyDrawer.vue';
+import AddNewJobPositionDrawer from '@/views/job_position/AddNewJobPositionDrawer.vue';
 import Skeleton from '@/views/skeleton/Skeleton.vue';
 import DeleteItemDialog from '@/@core/components/DeleteItemDialog.vue';
 import { VChip } from 'vuetify/components';
+import UpdateJobPositionDrawer from '@/views/job_position/UpdateJobPositionDrawer.vue';
 
 const searchQuery = ref('');
 const rowPerPage = ref(10);
 const currentPage = ref(1);
 const totalPage = ref(1);
 const totalElements = ref(0);
-const vacancies = ref([]);
+const job_positions = ref([]);
+const updateID = ref(0);
 
 const lastFetchedPage = ref(null);
 const isFetching = ref(false);
-// filter
-const selectedState = ref();
-const selectedCompany = ref();
-const selectedJobPosition = ref();
+// // filter
+// const selectedState = ref();
+// const selectedCompany = ref();
+// const selectedJobPosition = ref();
 
 const fetchData = async (force = false) => {
   isFetching.value = true;
   if (!force && (isFetching.value || currentPage.value === lastFetchedPage.value)) {
     return; // Если запрос уже выполняется или страница не изменилась и фильтры не изменялись
   }
-  const url = `/vacancies?page=${currentPage.value}`;
-  if (selectedState.value) url = url + '&state_id=' + selectedState.value;
-  if (selectedJobPosition.value) url = url + '&job_position_id=$' + selectedJobPosition.value;
-  if (selectedCompany.value) url = url + '&company_id=' + selectedCompany.value;
 
   try {
-    const vacancies_r = await axios.get(url);
+    const job_positions_r = await axios.get(`/job_positions?page=${currentPage.value}`);
 
-    vacancies.value = vacancies_r.data['vacancies'];
+    job_positions.value = job_positions_r.data['job_positions'];
     lastFetchedPage.value = currentPage.value; // Сохраняем последнюю загруженную страницу
-    currentPage.value = vacancies_r.data['meta']['current_page'];
-    totalElements.value = vacancies_r.data['meta']['total'];
-    totalPage.value = vacancies_r.data['meta']['last_page'];
-    rowPerPage.value = vacancies_r.data['meta']['per_page'];
+    currentPage.value = job_positions_r.data['meta']['current_page'];
+    totalElements.value = job_positions_r.data['meta']['total'];
+    totalPage.value = job_positions_r.data['meta']['last_page'];
+    rowPerPage.value = job_positions_r.data['meta']['per_page'];
   } catch (error) {
     console.error('Ошибка загрузки кандидатов:', error);
   } finally {
@@ -56,13 +54,13 @@ watch(currentPage, () => {
 const searchElements = async () => {
   try {
     isFetching.value = true;
-    const vacancies_r = await axios.get('/vacancies?search=' + searchQuery.value);
+    const job_positions_r = await axios.get('/job_positions?search=' + searchQuery.value);
 
-    vacancies.value = vacancies_r.data['vacancies'];
-    currentPage.value = vacancies_r.data['meta']['current_page'];
-    totalElements.value = vacancies_r.data['meta']['total'];
-    totalPage.value = vacancies_r.data['meta']['last_page'];
-    rowPerPage.value = vacancies_r.data['meta']['per_page'];
+    job_positions.value = job_positions_r.data['job_positions'];
+    currentPage.value = job_positions_r.data['meta']['current_page'];
+    totalElements.value = job_positions_r.data['meta']['total'];
+    totalPage.value = job_positions_r.data['meta']['last_page'];
+    rowPerPage.value = job_positions_r.data['meta']['per_page'];
   } catch (error) {
     console.error('Ошибка :', error);
   } finally {
@@ -72,7 +70,8 @@ const searchElements = async () => {
 
 watchEffect(fetchData);
 
-const isAddNewVacancyDrawerVisible = ref(false);
+const isAddNewJobPositionDrawerVisible = ref(false);
+const isUpdateJobPositionDrawerVisible = ref(false);
 
 // Pages start
 
@@ -83,13 +82,18 @@ watchEffect(() => {
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = vacancies?.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0;
-  const lastIndex = vacancies?.value.length + (currentPage.value - 1) * rowPerPage.value;
+  const firstIndex = job_positions?.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0;
+  const lastIndex = job_positions?.value.length + (currentPage.value - 1) * rowPerPage.value;
 
   return `${firstIndex}-${lastIndex} of ${totalElements.value}`;
 });
 
 // Pages end
+
+const openEditDrawer = (id) => {
+  updateID.value = id;
+  isUpdateJobPositionDrawerVisible.value = true;
+};
 
 // Delete
 const isDialogVisible = ref(false);
@@ -108,7 +112,7 @@ const confirmDelete = function (id, name) {
 const deleteItem = async function (id) {
   try {
     isDeleting.value = true;
-    await axios.delete('/vacancies/' + id);
+    await axios.delete('/job_positions/' + id);
     await fetchData(true);
     isDialogVisible.value = false;
   } catch (error) {
@@ -120,55 +124,55 @@ const deleteItem = async function (id) {
 // Delete end
 
 // Filter
-const states_list = ref([]);
+// const states_list = ref([]);
 
-const fetchStates = async () => {
-  try {
-    const response = await axios.get('/states');
-    states_list.value = await response.data.states.filter((el) => el.table === 'vacancies');
-  } catch (error) {
-    console.error('Ошибка :', error);
-  }
-};
-watchEffect(fetchStates);
+// const fetchStates = async () => {
+//   try {
+//     const response = await axios.get('/states');
+//     states_list.value = await response.data.states.filter((el) => el.table === 'job_positions');
+//   } catch (error) {
+//     console.error('Ошибка :', error);
+//   }
+// };
+// watchEffect(fetchStates);
 
-const companies_list = ref([]);
+// const companies_list = ref([]);
 
-const fetchCompanies = async () => {
-  try {
-    const response = await axios.get('/companies');
-    companies_list.value = await response.data.companies;
-  } catch (error) {
-    console.error('Ошибка :', error);
-  }
-};
-watchEffect(fetchCompanies);
+// const fetchCompanies = async () => {
+//   try {
+//     const response = await axios.get('/companies');
+//     companies_list.value = await response.data.companies;
+//   } catch (error) {
+//     console.error('Ошибка :', error);
+//   }
+// };
+// watchEffect(fetchCompanies);
 
-const job_positions_list = ref([]);
+// const job_positions_list = ref([]);
 
-const fetchJobPositions = async () => {
-  try {
-    const response = await axios.get('/job_positions');
-    job_positions_list.value = await response.data.job_positions;
-  } catch (error) {
-    console.error('Ошибка :', error);
-  }
-};
-watchEffect(fetchJobPositions);
+// const fetchJobPositions = async () => {
+//   try {
+//     const response = await axios.get('/job_positions');
+//     job_positions_list.value = await response.data.job_positions;
+//   } catch (error) {
+//     console.error('Ошибка :', error);
+//   }
+// };
+// watchEffect(fetchJobPositions);
 
-// State
-const resolveVacancyState = (state) => {
-  const vacancyLowerCase = state?.toString().toLowerCase();
-  const vacancyMap = {
-    7: { color: 'primary', icon: 'bx-user' },
-    9: { color: 'warning', icon: 'bx-cog' },
-    8: { color: 'success', icon: 'bx-doughnut-chart' },
-    // invite: { color: 'info', icon: 'bx-pencil' },
-    // archive: { color: 'error', icon: 'bx-laptop' },
-  };
+// // State
+// const resolveJobPositionState = (state) => {
+//   const job_positionLowerCase = state?.toString().toLowerCase();
+//   const job_positionMap = {
+//     7: { color: 'primary', icon: 'bx-user' },
+//     9: { color: 'warning', icon: 'bx-cog' },
+//     8: { color: 'success', icon: 'bx-doughnut-chart' },
+//     // invite: { color: 'info', icon: 'bx-pencil' },
+//     // archive: { color: 'error', icon: 'bx-laptop' },
+//   };
 
-  return vacancyMap[vacancyLowerCase] || { color: 'primary', icon: 'bx-user' };
-};
+//   return job_positionMap[job_positionLowerCase] || { color: 'primary', icon: 'bx-user' };
+// };
 </script>
 
 <template>
@@ -185,7 +189,7 @@ const resolveVacancyState = (state) => {
           />
 
           <VCardText class="d-flex flex-wrap">
-            <VCol cols="2">
+            <!-- <VCol cols="2">
               <VSelect
                 v-model="selectedState"
                 label="Select State"
@@ -217,18 +221,18 @@ const resolveVacancyState = (state) => {
                 clearable
                 clear-icon="bx-x"
               />
-            </VCol>
+            </VCol> -->
             <VSpacer />
 
             <VCol cols="4" class="app-user-search-filter d-flex align-center">
               <VTextField
                 v-model="searchQuery"
                 @keyup.enter="searchElements"
-                placeholder="Search Vacancy"
+                placeholder="Search JobPosition"
                 density="compact"
                 class="me-6"
               />
-              <VBtn @click="isAddNewVacancyDrawerVisible = true"> Add new Vacancy </VBtn>
+              <VBtn @click="isAddNewJobPositionDrawerVisible = true"> Add new Job </VBtn>
             </VCol>
           </VCardText>
 
@@ -238,42 +242,41 @@ const resolveVacancyState = (state) => {
             <thead>
               <tr>
                 <th style="width: 48px">ID</th>
-                <th>COMPANY</th>
-                <th>JOB</th>
-                <th>STATE</th>
+                <th>TITLE</th>
                 <th>ACTIONS</th>
               </tr>
             </thead>
 
-            <tbody v-if="vacancies.length">
-              <tr v-for="(vacancy, i) in vacancies" :key="i">
+            <tbody v-if="job_positions.length">
+              <tr v-for="(job_position, i) in job_positions" :key="i">
                 <td>{{ i + 1 }}</td>
-                <td>{{ vacancy?.company?.title }}</td>
-                <td>{{ vacancy.job_position?.name_ru }}</td>
-                <td>
-                  <VChip
-                    :color="resolveVacancyState(vacancy?.state?.id).color"
-                    density="compact"
-                    label
-                    class="text-uppercase"
-                  >
-                    {{ vacancy.state.name_ru }}
-                  </VChip>
-                </td>
+                <td>{{ job_position?.name_ru }}</td>
+      
                 <td class="text-center" style="width: 80px">
+                  <VIcon
+                    @click="
+                      (event) => {
+                        event.stopPropagation();
+                        openEditDrawer(job_position.id);
+                      }
+                    "
+                    size="30"
+                    icon="bx-edit-alt"
+                    style="color: rgb(var(--v-global-theme-primary))"
+                  ></VIcon>
                   <VIcon
                     size="30"
                     icon="bx-trash"
                     style="color: red"
-                    @click="confirmDelete(vacancy.id, vacancy.title)"
+                    @click="confirmDelete(job_position.id, job_position.title)"
                   ></VIcon>
                 </td>
               </tr>
             </tbody>
 
-            <Skeleton :count="5" v-else-if="isFetching && !vacancies.length" />
+            <Skeleton :count="4" v-else-if="isFetching && !job_positions.length" />
 
-            <tfoot v-else-if="!isFetching && !vacancies.length">
+            <tfoot v-else-if="!isFetching && !job_positions.length">
               <tr>
                 <td colspan="7" class="text-center text-body-1">No data available</td>
               </tr>
@@ -288,7 +291,7 @@ const resolveVacancyState = (state) => {
             </div>
 
             <VPagination
-              v-if="vacancies.length"
+              v-if="job_positions.length"
               v-model="currentPage"
               size="small"
               :total-visible="1"
@@ -299,11 +302,14 @@ const resolveVacancyState = (state) => {
       </VCol>
     </VRow>
 
-    <AddNewVacancyDrawer
-      v-model:isDrawerOpen="isAddNewVacancyDrawerVisible"
+    <AddNewJobPositionDrawer
+      v-model:isDrawerOpen="isAddNewJobPositionDrawerVisible"
       @fetchDatas="() => fetchData(true)"
-      :job_positions_list="job_positions_list"
-      :companies_list="companies_list"
+    />
+    <UpdateJobPositionDrawer
+      v-model:isDrawerOpen="isUpdateJobPositionDrawerVisible"
+      @fetchDatas="() => fetchData(true)"
+      :id="updateID"
     />
   </section>
 </template>

@@ -10,9 +10,7 @@ const props = defineProps({
   isDrawerOpen: {
     type: Boolean,
     required: true,
-  },
-  companies_list: { type: Array, required: true },
-  job_positions_list: { type: Array, required: true },
+  }
 });
 
 const emit = defineEmits(['update:isDrawerOpen', 'fetchDatas']);
@@ -20,11 +18,8 @@ const emit = defineEmits(['update:isDrawerOpen', 'fetchDatas']);
 const isFetching = ref(false);
 const isFormValid = ref(false);
 const refForm = ref();
-// const companies_list = ref([]);
-const company_id = ref();
-const job_position_id = ref();
-const quantity = ref();
-const description = ref();
+const name_ru = ref();
+const name_uz = ref();
 
 // 👉 drawer close
 const closeNavigationDrawer = () => {
@@ -40,11 +35,9 @@ const onSubmit = () => {
     if (valid) {
       isFetching.value = true;
       try {
-        const response = await axios.post('/vacancies', {
-          company_id: company_id.value,
-          job_position_id: job_position_id.value,
-          quantity: quantity.value,
-          description: description.value,
+        const response = await axios.post('/job_positions', {
+          name_ru: name_ru.value,
+          name_uz: name_uz.value,
         });
 
         if (response.status == 200) {
@@ -86,7 +79,7 @@ const handleDrawerModelValueUpdate = (val) => {
     @update:model-value="handleDrawerModelValueUpdate"
   >
     <!-- 👉 Title -->
-    <AppDrawerHeaderSection title="Добавить новую вакансию" @cancel="closeNavigationDrawer" />
+    <AppDrawerHeaderSection title="Добавить новую работу" @cancel="closeNavigationDrawer" />
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
@@ -101,34 +94,11 @@ const handleDrawerModelValueUpdate = (val) => {
           >
             <VRow>
               <VCol cols="12">
-                <VSelect
-                  v-model="company_id"
-                  label="Select Company"
-                  :items="props.companies_list"
-                  item-title="title"
-                  item-value="id"
-                  clearable
-                  clear-icon="bx-x"
-                />
+                <VTextField v-model="name_ru" :rules="[requiredValidator]" label="Title" />
               </VCol>
 
               <VCol cols="12">
-                <VSelect
-                  v-model="job_position_id"
-                  label="Select Job"
-                  :items="props.job_positions_list"
-                  item-title="name_ru"
-                  item-value="id"
-                  clearable
-                  clear-icon="bx-x"
-                />
-              </VCol>
-
-              <VCol cols="12">
-                <VTextField v-model="quantity" label="Count" type="number" />
-              </VCol>
-              <VCol cols="12">
-                <VTextarea v-model="description" label="Description" />
+                <VTextField v-model="name_uz" :rules="[requiredValidator]" label="Title" />
               </VCol>
 
               <!-- 👉 Submit and Cancel -->

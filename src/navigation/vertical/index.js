@@ -41,6 +41,13 @@ export default [
     subject: 'Vacancies',
     action: 'show'
   },
+  {
+    title: 'Jobs',
+    to: { name: 'Jobs' },
+    icon: { icon: 'mdi-briefcase' },
+    subject: 'Jobs',
+    action: 'show'
+  },
 ]
 
 

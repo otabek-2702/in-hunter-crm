@@ -37,7 +37,7 @@ const router = createRouter({
         {
           path: '',
           name: 'Index',
-          redirect: {name: 'Candidates'}
+          redirect: { name: 'Candidates' }
         },
         {
           path: '/roles',
@@ -45,7 +45,7 @@ const router = createRouter({
           component: () => import("@/pages/roles.vue"),
           meta: {
             action: 'show',
-            subject:'Roles',
+            subject: 'Roles',
           }
         },
         {
@@ -54,37 +54,45 @@ const router = createRouter({
           component: Candidates,
           meta: {
             action: 'show',
-            subject:'Candidates',
+            subject: 'Candidates',
           }
         },
         {
           path: 'employees',
           name: 'Employees',
-          component: ()=> import("@/pages/employees.vue"),
+          component: () => import("@/pages/employees.vue"),
           meta: {
             action: 'show',
-            subject:'Employees',
+            subject: 'Employees',
           }
         },
         {
           path: 'companies',
           name: 'Companies',
-          component: ()=> import("@/pages/companies.vue"),
+          component: () => import("@/pages/companies.vue"),
           meta: {
             action: 'show',
-            subject:'Companies',
+            subject: 'Companies',
           }
         },
         {
           path: 'vacancies',
           name: 'Vacancies',
-          component: ()=> import("@/pages/vacancies.vue"),
+          component: () => import("@/pages/vacancies.vue"),
           meta: {
             action: 'show',
-            subject:'Vacancies',
+            subject: 'Vacancies',
           }
         },
-
+        {
+          path: 'jobs',
+          name: 'Jobs',
+          component: () => import("@/pages/jobs.vue"),
+          meta: {
+            action: 'show',
+            subject: 'Jobs',
+          }
+        },
       ],
     },
     ...setupLayouts(routes),

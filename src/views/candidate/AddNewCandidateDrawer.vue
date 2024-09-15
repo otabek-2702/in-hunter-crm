@@ -4,6 +4,7 @@ import { requiredValidator } from '@validators';
 import { nextTick, ref, watchEffect } from 'vue';
 import AppDrawerHeaderSection from '@core/components/AppDrawerHeaderSection.vue';
 import axios from '@axios';
+import { toast } from 'vue3-toastify';
 
 const props = defineProps({
   isDrawerOpen: {
@@ -55,6 +56,11 @@ const onSubmit = () => {
           address: address.value,
         });
         emit('fetchDatas');
+        toast('Успешно добавлено', {
+          theme: 'auto',
+          type: 'success',
+          dangerouslyHTMLString: true,
+        });
         emit('update:isDrawerOpen', false);
         nextTick(() => {
           refForm.value?.reset();
