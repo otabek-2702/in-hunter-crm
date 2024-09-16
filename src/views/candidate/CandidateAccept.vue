@@ -1,8 +1,7 @@
 <script setup>
-import { ref, watchEffect } from 'vue';
+import { ref } from 'vue';
 import axios from '@axios';
 import DialogCloseBtn from '@core/components/DialogCloseBtn.vue';
-import { computed } from 'vue';
 import { toast } from 'vue3-toastify';
 import { watch } from 'vue';
 
@@ -59,7 +58,6 @@ const fetchCompanies = async () => {
     console.error('Ошибка :', error);
   }
 };
-watchEffect(fetchCompanies);
 
 const vacancies_list = ref([]);
 
@@ -87,7 +85,10 @@ const fetchVacancies = async () => {
   }
 };
 watch(selectedCompany, (newVal) => {
-  if (newVal) fetchVacancies();
+  if (newVal) {
+    fetchVacancies();
+    fetchCompanies()
+  }
 });
 
 const isFetching1 = ref(false);

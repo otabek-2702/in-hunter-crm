@@ -212,19 +212,10 @@ const resolveVacancyState = (state) => {
             :isDeleting="isDeleting"
           />
 
-          <VCardText class="d-flex flex-wrap">
-            <VCol cols="6"/>
-            <VCol cols="6" class="app-user-search-filter d-flex align-center flex-wrap">
-              <VTextField
-                v-model="searchQuery"
-                @keyup.enter="searchElements"
-                placeholder="Поиск вакансии"
-                density="compact"
-                class="me-6"
-              />
-              <VBtn @click="isAddNewVacancyDrawerVisible = true"> Добавить новую вакансию </VBtn>
-            </VCol>
-            <VCol cols="2">
+          <VCardText class="d-flex flex-wrap pb-0">
+            <!-- <VCol cols="6"/> -->
+
+            <VCol cols="3">
               <VSelect
                 v-model="selectedState"
                 label="Выберите статус"
@@ -257,8 +248,20 @@ const resolveVacancyState = (state) => {
                 clear-icon="bx-x"
               />
             </VCol>
-            <VSpacer />
 
+            <VCol cols="3" class="app-user-search-filter d-flex align-center flex-wrap">
+              <VTextField
+                v-model="searchQuery"
+                @keyup.enter="searchElements"
+                placeholder="Поиск вакансии"
+                density="compact"
+                class="me-6"
+              />
+            </VCol>
+            <VCol cols="9" />
+            <VCol cols="3">
+              <VBtn @click="isAddNewVacancyDrawerVisible = true"> Добавить новую вакансию </VBtn>
+            </VCol>
           </VCardText>
 
           <VDivider />
