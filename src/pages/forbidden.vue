@@ -9,15 +9,15 @@ const pageMiscError = useGenerateImageVariant(pageUnderMaintenance, pageUnderMai
 <template>
   <div class="misc-wrapper">
     <ErrorHeader
-      error-title="Forbidden ⚠️"
-      error-description="Oops! 😖 The requested URL was forbidden."
+      error-title="Доступ запрещён ⚠️"
+      error-description="Упс! 😖 Запрашиваемый URL был запрещён."
     />
 
-    <!-- 👉 Image -->
+    <!-- 👉 Изображение -->
     <div class="misc-avatar w-100 text-center">
       <VImg
         :src="pageMiscError"
-        alt="Coming Soon"
+        alt="Скоро"
         :max-width="500"
         class="mx-auto"
       />
@@ -25,11 +25,12 @@ const pageMiscError = useGenerateImageVariant(pageUnderMaintenance, pageUnderMai
         to="/"
         class="mt-10"
       >
-        Back to Home
+        Назад на главную
       </VBtn>
     </div>
   </div>
 </template>
+
 
 <style lang="scss">
 @use "@core/scss/template/pages/misc.scss";

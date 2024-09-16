@@ -53,10 +53,6 @@ onMounted(() => {
   fetchData();
 });
 
-// 👉 watching current page
-watchEffect(() => {
-  if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
-});
 
 const resolveUserRoleVariant = (role) => {
   const roleLowerCase = role.toLowerCase();
@@ -96,7 +92,16 @@ const roleData = ref({
   id: 1,
   name: null,
 });
+// Pages start
+
 // 👉 watching current page
+watch(currentPage, () => {
+  if (!isFetching.value) {
+    fetchData();
+  }
+});
+
+// 👉 Watching current page
 watchEffect(() => {
   if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
 });
@@ -108,6 +113,8 @@ const paginationData = computed(() => {
 
   return `${firstIndex}-${lastIndex} of ${totalRoles.value}`;
 });
+
+// Pages end
 
 // Add
 const isAddNewRoleDrawerVisible = ref(false);
@@ -176,7 +183,7 @@ const deleteItem = async function (id) {
   <section>
     <VRow>
       <VCol cols="12">
-        <VCard title="Search Filters">
+        <VCard title="Фильтры поиска">
           <DeleteItemDialog
             @confirm="deleteItem"
             :isDialogVisible="isDialogVisible"
@@ -193,12 +200,12 @@ const deleteItem = async function (id) {
               <VTextField
                 v-model="searchQuery"
                 @keyup.enter="searchElements"
-                placeholder="Search Role"
+                placeholder="Поиск роли"
                 density="compact"
                 class="me-3"
               />
 
-              <VBtn @click="isAddNewRoleDrawerVisible = true"> Add new Role </VBtn>
+              <VBtn @click="isAddNewRoleDrawerVisible = true">Добавить новую роль</VBtn>
             </div>
           </VCardText>
 
@@ -209,10 +216,9 @@ const deleteItem = async function (id) {
             <thead>
               <tr>
                 <th scope="col" style="width: 48px">ID</th>
-                <th scope="col">NAME</th>
-                <th scope="col">PERMISSIONS</th>
-
-                <th scope="col">ACTIONS</th>
+                <th scope="col">ИМЯ</th>
+                <th scope="col">ПРАВА</th>
+                <th scope="col">ДЕЙСТВИЯ</th>
               </tr>
             </thead>
 
@@ -267,7 +273,7 @@ const deleteItem = async function (id) {
             <!-- 👉 table footer  -->
             <tfoot v-if="isFetching && !roles.length">
               <tr>
-                <td colspan="7" class="text-center text-body-1">No data available</td>
+                <td colspan="7" class="text-center text-body-1">Нет данных</td>
               </tr>
             </tfoot>
           </VTable>
@@ -276,18 +282,6 @@ const deleteItem = async function (id) {
 
           <!-- SECTION Pagination -->
           <VCardText class="d-flex flex-wrap justify-end gap-4 pa-2">
-            <!-- 👉 Rows per page -->
-            <div class="d-flex align-center" style="width: 171px">
-              <!--              <span class="text-no-wrap text-sm me-3">Rows per page:</span>-->
-              <!--              <VSelect-->
-              <!--                  v-model="rowPerPage"-->
-              <!--                  density="compact"-->
-              <!--                  class="per-page-select"-->
-              <!--                  variant="plain"-->
-              <!--                  :items="[10, 20, 30, 50]"-->
-              <!--              />-->
-            </div>
-
             <!-- 👉 Pagination and pagination meta -->
             <div class="d-flex align-center" v-if="roles.length">
               <h6 class="text-sm font-weight-regular">
@@ -318,10 +312,7 @@ const deleteItem = async function (id) {
 
 <style lang="scss">
 .app-user-search-filter {
-  inline-size: 385px;
-}
-
-.text-capitalize {
-  text-transform: capitalize;
+  display: flex;
+  align-items: center;
 }
 </style>

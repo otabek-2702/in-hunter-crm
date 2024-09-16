@@ -78,7 +78,7 @@ const fetchVacancies = async () => {
       vacancies_list.value = [
         {
           id: 0,
-          job_position_name_ru: 'no vacancies found in this company',
+          job_position_name_ru: 'Нет вакансий в этой компании.',
         },
       ];
     }
@@ -161,10 +161,9 @@ const onArchive = async () => {
   }
 };
 </script>
-
 <template>
   <VDialog v-model="isDialogVisible" max-width="600">
-    <!-- Dialog Activator -->
+    <!-- Активатор диалога -->
     <template #activator="{ props }">
       <VIcon
         v-bind="props"
@@ -178,19 +177,19 @@ const onArchive = async () => {
       ></VIcon>
     </template>
 
-    <!-- Dialog Content -->
-    <VCard title="User Profile">
+    <!-- Содержимое диалога -->
+    <VCard title="Профиль пользователя">
       <DialogCloseBtn variant="text" size="small" @click="onFormCancel" />
 
       <VCardText>
         <VRow class="justify-center">
           <VCol cols="12">
-            <VTextarea label="Comment" v-model="comment" />
+            <VTextarea label="Комментарий" v-model="comment" />
           </VCol>
           <VCol cols="6">
             <VSelect
               v-model="selectedCompany"
-              label="Select Company"
+              label="Выберите компанию"
               :items="companies_list"
               item-title="title"
               item-value="id"
@@ -202,7 +201,7 @@ const onArchive = async () => {
             <VSelect
               v-if="vacancies_list.length"
               v-model="selectedVacancy"
-              label="Select Vacancy"
+              label="Выберите вакансию"
               :items="vacancies_list"
               item-title="job_position_name_ru"
               item-value="id"
@@ -212,20 +211,21 @@ const onArchive = async () => {
             />
           </VCol>
 
-          <!-- 👉 Submit and Cancel -->
+          <!-- 👉 Отправить и Отмена -->
 
-          <VCol cols="3" class="px-1">
+          <VCol cols="4" class="px-1">
             <VBtn
               :loading="isFetching1"
               :disabled="isFetching1 || isFetching2 || isFetching3"
               class="w-100"
+              color="warning"
               @click="onCancel"
             >
-              Bekor qilish
+              Отменить
               <VIcon icon="bx-minus-circle" class="ml-1 mr-0" />
             </VBtn>
           </VCol>
-          <VCol cols="3" class="px-1">
+          <VCol cols="4" class="px-1">
             <VBtn
               :loading="isFetching2"
               :disabled="isFetching1 || isFetching2 || isFetching3"
@@ -233,11 +233,11 @@ const onArchive = async () => {
               color="error"
               @click="onBlock"
             >
-              Bloklash
+              Заблокировать
               <VIcon icon="bx-block" class="ml-1 mr-0" />
             </VBtn>
           </VCol>
-          <VCol cols="3" class="px-1">
+          <VCol cols="4" class="px-1">
             <VBtn
               :loading="isFetching3"
               :disabled="isFetching1 || isFetching2 || isFetching3"
@@ -245,23 +245,18 @@ const onArchive = async () => {
               color="secondary"
               @click="onArchive"
             >
-              Archive
+              Архивировать
               <VIcon icon="bx-archive-in" class="ml-1 mr-0" />
             </VBtn>
           </VCol>
-          <VCol cols="3" class="px-1">
+          <VCol cols="12" class="px-1">
             <VBtn @click="onSubmit" :loading="isFetching" :disabled="isFetching" class="w-100">
-              Submit
+              Отправить
               <VIcon icon="mdi-file-document-arrow-right-outline" class="ml-1 mr-0" />
             </VBtn>
           </VCol>
         </VRow>
       </VCardText>
-
-      <!-- <VCardText class="d-flex justify-end gap-2">
-        <VBtn color="secondary" variant="tonal" @click="isDialogVisible = false"> Close </VBtn>
-        <VBtn @click="isDialogVisible = false"> Save </VBtn>
-      </VCardText> -->
     </VCard>
   </VDialog>
 </template>

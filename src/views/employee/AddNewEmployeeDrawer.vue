@@ -52,7 +52,7 @@ const onSubmit = () => {
         }
       } catch (error) {
         if (error.response.data.message == 'The login has already been taken.') {
-          toast('Ushbu login bant.', {
+          toast('Этот логин уже занят.', {
             theme: 'auto',
             type: 'error',
             dangerouslyHTMLString: true,
@@ -94,13 +94,13 @@ watchEffect(fetchRoles);
     :model-value="props.isDrawerOpen"
     @update:model-value="handleDrawerModelValueUpdate"
   >
-    <!-- 👉 Title -->
-    <AppDrawerHeaderSection title="Add Employee" @cancel="closeNavigationDrawer" />
+    <!-- 👉 Заголовок -->
+    <AppDrawerHeaderSection title="Добавить сотрудника" @cancel="closeNavigationDrawer" />
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
         <VCardText>
-          <!-- 👉 Form -->
+          <!-- 👉 Форма -->
 
           <VForm
             ref="refForm"
@@ -110,25 +110,25 @@ watchEffect(fetchRoles);
           >
             <VRow>
               <VCol cols="12">
-                <VTextField v-model="name" :rules="[requiredValidator]" label="Name" />
+                <VTextField v-model="name" :rules="[requiredValidator]" label="Имя" />
               </VCol>
 
               <VCol cols="12">
                 <VTextField
                   v-model="login"
                   :rules="[requiredValidator]"
-                  label="Login"
+                  label="Логин"
                 />
               </VCol>
 
               <VCol cols="12">
-                <VTextField v-model="password" :rules="[requiredValidator]" label="Password" />
+                <VTextField v-model="password" :rules="[requiredValidator]" label="Пароль" />
               </VCol>
               <VCol cols="12">
                 <VSelect
                   persistent-hint
                   v-model="role_id"
-                  label="Select role"
+                  label="Выберите роль"
                   :rules="[requiredValidator]"
                   :items="roles_list"
                   item-title="name_ru"
@@ -136,13 +136,13 @@ watchEffect(fetchRoles);
                 />
               </VCol>
 
-              <!-- 👉 Submit and Cancel -->
+              <!-- 👉 Отправить и отменить -->
               <VCol cols="12">
                 <VBtn :loading="isFetching" :disabled="isFetching" type="submit" class="me-3">
-                  Submit
+                  Отправить
                 </VBtn>
                 <VBtn type="reset" variant="tonal" color="secondary" @click="closeNavigationDrawer">
-                  Cancel
+                  Отмена
                 </VBtn>
               </VCol>
             </VRow>
@@ -152,3 +152,4 @@ watchEffect(fetchRoles);
     </PerfectScrollbar>
   </VNavigationDrawer>
 </template>
+

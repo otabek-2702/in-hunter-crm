@@ -44,12 +44,6 @@ const fetchData = async (force = false) => {
   }
 };
 
-// 👉 watching current page
-watch(currentPage, () => {
-  if (!isFetching.value) {
-    fetchData();
-  }
-});
 
 // search
 const searchElements = async () => {
@@ -71,6 +65,13 @@ onMounted(() => {
 });
 
 // Pages start
+
+// 👉 watching current page
+watch(currentPage, () => {
+  if (!isFetching.value) {
+    fetchData();
+  }
+});
 
 // 👉 Watching current page
 watchEffect(() => {
@@ -132,7 +133,7 @@ const deleteItem = async function (id) {
   <section>
     <VRow>
       <VCol cols="12">
-        <VCard title="Search Filters">
+        <VCard title="Фильтры поиска">
           <DeleteItemDialog
             @confirm="deleteItem"
             :isDialogVisible="isDialogVisible"
@@ -148,11 +149,11 @@ const deleteItem = async function (id) {
               <VTextField
                 v-model="searchQuery"
                 @keyup.enter="searchElements"
-                placeholder="Search Employee"
+                placeholder="Поиск сотрудника"
                 density="compact"
                 class="me-6"
               />
-              <VBtn @click="isAddNewEmployeeDrawerVisible = true"> Add new Employee </VBtn>
+              <VBtn @click="isAddNewEmployeeDrawerVisible = true">Добавить нового сотрудника</VBtn>
             </VCol>
           </VCardText>
 
@@ -162,9 +163,9 @@ const deleteItem = async function (id) {
             <thead>
               <tr>
                 <th style="width: 48px">ID</th>
-                <th>FULL NAME</th>
-                <th>LOGIN</th>
-                <th>ACTIONS</th>
+                <th>ФИО</th>
+                <th>Логин</th>
+                <th>Действия</th>
               </tr>
             </thead>
 
@@ -199,7 +200,7 @@ const deleteItem = async function (id) {
 
             <tfoot v-if="!isFetching && !employees.length">
               <tr>
-                <td colspan="7" class="text-center text-body-1">No data available</td>
+                <td colspan="7" class="text-center text-body-1">Нет доступных данных</td>
               </tr>
             </tfoot>
           </VTable>
@@ -234,6 +235,7 @@ const deleteItem = async function (id) {
     />
   </section>
 </template>
+
 
 <style lang="scss">
 .app-user-search-filter {

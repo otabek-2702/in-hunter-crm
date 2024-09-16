@@ -9,15 +9,15 @@ const girlWithLaptop = useGenerateImageVariant(girlWithLaptopLight, girlWithLapt
 <template>
   <div class="misc-wrapper">
     <ErrorHeader
-      error-title="You are not authorized! 🔐"
-      error-description="You don't have permission to access this page. Go Home!"
+      error-title="Вы не авторизованы! 🔐"
+      error-description="У вас нет разрешения для доступа к этой странице. Вернуться на главную!"
     />
 
-    <!-- 👉 Image -->
+    <!-- 👉 Изображение -->
     <div class="misc-avatar w-100 text-center">
       <VImg
         :src="girlWithLaptop"
-        alt="Coming Soon"
+        alt="Скоро будет"
         :max-width="500"
         class="mx-auto"
       />
@@ -25,11 +25,12 @@ const girlWithLaptop = useGenerateImageVariant(girlWithLaptopLight, girlWithLapt
         to="/"
         class="mt-10"
       >
-        Back to Home
+        Вернуться на главную
       </VBtn>
     </div>
   </div>
 </template>
+
 
 <style lang="scss">
 @use "@core/scss/template/pages/misc.scss";

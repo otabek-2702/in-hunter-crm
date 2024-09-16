@@ -84,7 +84,7 @@ const role = ref(JSON.parse(localStorage.getItem('userData')).role.name_ru)
               />
             </template>
 
-            <VListItemTitle>Logout</VListItemTitle>
+            <VListItemTitle>Выйти</VListItemTitle>
           </VListItem>
         </VList>
       </VMenu>

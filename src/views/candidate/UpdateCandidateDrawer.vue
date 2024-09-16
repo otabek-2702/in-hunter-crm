@@ -134,37 +134,37 @@ watch(
     :model-value="props.isDrawerOpen"
     @update:model-value="handleDrawerModelValueUpdate"
   >
-    <!-- 👉 Title -->
-    <AppDrawerHeaderSection title="Add Candidate" @cancel="closeNavigationDrawer" />
+    <!-- 👉 Заголовок -->
+    <AppDrawerHeaderSection title="Добавить кандидата" @cancel="closeNavigationDrawer" />
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
         <VCardText>
-          <!-- 👉 Form -->
+          <!-- 👉 Форма -->
           <VForm ref="refForm" v-model="isFormValid" @submit.prevent="onSubmit">
             <VRow>
               <VCol cols="12">
-                <VTextField v-model="full_name" :rules="[requiredValidator]" label="Full name" />
+                <VTextField v-model="full_name" :rules="[requiredValidator]" label="Полное имя" />
               </VCol>
 
               <VCol cols="12">
                 <VTextField
                   v-model="phone_number"
                   :rules="[requiredValidator]"
-                  label="Phone number"
+                  label="Номер телефона"
                 />
               </VCol>
               <VCol cols="12">
-                <VTextField type="number" v-model="age" :rules="[requiredValidator]" label="Age" />
+                <VTextField type="number" v-model="age" :rules="[requiredValidator]" label="Возраст" />
               </VCol>
               <VCol cols="12">
-                <VTextField v-model="address" :rules="[requiredValidator]" label="Address" />
+                <VTextField v-model="address" :rules="[requiredValidator]" label="Адрес" />
               </VCol>
 
               <VCol cols="12">
                 <VRadioGroup v-model="gender" inline :rules="[requiredValidator]">
-                  <VRadio label="Man" value="man" density="compact" />
-                  <VRadio label="Woman" value="woman" density="compact" />
+                  <VRadio label="Мужчина" value="man" density="compact" />
+                  <VRadio label="Женщина" value="woman" density="compact" />
                 </VRadioGroup>
               </VCol>
 
@@ -172,16 +172,16 @@ watch(
                 <VTextField
                   v-model="positive_skills"
                   :rules="[requiredValidator]"
-                  label="Positive skills"
+                  label="Положительные качества"
                 />
               </VCol>
 
               <VCol cols="12">
-                <VTextField v-model="apps_text" :rules="[requiredValidator]" label="Apps text" />
+                <VTextField v-model="apps_text" :rules="[requiredValidator]" label="Описание приложений" />
               </VCol>
 
               <VCol cols="12">
-                <VTextField v-model="apps" :rules="[requiredValidator]" label="Apps" />
+                <VTextField v-model="apps" :rules="[requiredValidator]" label="Приложения" />
               </VCol>
 
               <VCol cols="12">
@@ -189,7 +189,7 @@ watch(
                   multiple
                   persistent-hint
                   v-model="languages"
-                  label="Select language"
+                  label="Выберите язык"
                   :rules="[requiredValidator]"
                   :items="languages_list"
                   item-title="name_ru"
@@ -197,13 +197,13 @@ watch(
                 />
               </VCol>
 
-              <!-- 👉 Submit and Cancel -->
+              <!-- 👉 Отправить и Отмена -->
               <VCol cols="12">
                 <VBtn :loading="isFetching" :disabled="isFetching" type="submit" class="me-3">
-                  Submit
+                  Отправить
                 </VBtn>
                 <VBtn type="reset" variant="tonal" color="secondary" @click="closeNavigationDrawer">
-                  Cancel
+                  Отмена
                 </VBtn>
               </VCol>
             </VRow>
@@ -213,3 +213,4 @@ watch(
     </PerfectScrollbar>
   </VNavigationDrawer>
 </template>
+

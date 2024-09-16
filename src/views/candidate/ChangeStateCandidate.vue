@@ -118,7 +118,7 @@ const onNextState = async () => {
   }
 };
 
-const archiveLabel = computed(() => (props.state_slug === 'archive' ? 'Unarchive' : 'Archive'));
+const archiveLabel = computed(() => (props.state_slug === 'archive' ? 'Разархивировать' : 'Архивировать'));
 </script>
 
 <template>
@@ -138,35 +138,35 @@ const archiveLabel = computed(() => (props.state_slug === 'archive' ? 'Unarchive
     </template>
 
     <!-- Dialog Content -->
-    <VCard title="User Profile">
+    <VCard title="Профиль пользователя">
       <DialogCloseBtn variant="text" size="small" @click="isDialogVisible = false" />
 
       <VCardText>
         <VRow class="justify-center">
           <VCol cols="12">
-            <VTextarea label="Comment" v-model="comment" />
+            <VTextarea label="Комментарий" v-model="comment" />
           </VCol>
-          <VCol cols="3" class="px-1">
-            <VBtn :loading="isFetching1" :disabled="(isFetching1 || isFetching2 || isFetching3 || isFetching4)" class="w-100" @click="onCancel">
-              Bekor qilish
+          <VCol cols="4" class="px-1">
+            <VBtn :loading="isFetching1" :disabled="(isFetching1 || isFetching2 || isFetching3 || isFetching4)" class="w-100" @click="onCancel" color="warning">
+              Отменить
               <VIcon icon="bx-minus-circle" class="ml-1 mr-0" />
             </VBtn>
           </VCol>
-          <VCol cols="3" class="px-1">
+          <VCol cols="4" class="px-1">
             <VBtn :loading="isFetching2" :disabled="(isFetching1 || isFetching2 || isFetching3 || isFetching4)" class="w-100" color="error" @click="onBlock">
-              Bloklash
+              Заблокировать
               <VIcon icon="bx-block" class="ml-1 mr-0" />
             </VBtn>
           </VCol>
-          <VCol cols="3" class="px-1">
+          <VCol cols="4" class="px-1">
             <VBtn :loading="isFetching3" :disabled="(isFetching1 || isFetching2 || isFetching3 || isFetching4)" class="w-100" color="secondary" @click="onArchive">
               {{ archiveLabel }}
               <VIcon icon="bx-archive-in" class="ml-1 mr-0" />
             </VBtn>
           </VCol>
-          <VCol cols="3" class="px-1" v-if="props.state_slug != 'archive'">
+          <VCol cols="12" class="px-1" v-if="props.state_slug != 'archive'">
             <VBtn :loading="isFetching4" :disabled="(isFetching1 || isFetching2 || isFetching3 || isFetching4)" class="w-100" color="success" @click="onNextState">
-              Keyingi
+              Далее
               <VIcon icon="bx-right-arrow-alt" class="ml-1 mr-0" />
             </VBtn>
           </VCol>
@@ -174,9 +174,10 @@ const archiveLabel = computed(() => (props.state_slug === 'archive' ? 'Unarchive
       </VCardText>
 
       <!-- <VCardText class="d-flex justify-end gap-2">
-        <VBtn color="secondary" variant="tonal" @click="isDialogVisible = false"> Close </VBtn>
-        <VBtn @click="isDialogVisible = false"> Save </VBtn>
+        <VBtn color="secondary" variant="tonal" @click="isDialogVisible = false"> Закрыть </VBtn>
+        <VBtn @click="isDialogVisible = false"> Сохранить </VBtn>
       </VCardText> -->
     </VCard>
   </VDialog>
 </template>
+

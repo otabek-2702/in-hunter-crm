@@ -77,13 +77,6 @@ const fetchData = async (force = false) => {
   }
 };
 
-// 👉 watching current page
-watch(currentPage, () => {
-  if (!isFetching.value) {
-    fetchData();
-  }
-});
-
 // Get main datas end
 
 // 👉 watching selected filters
@@ -141,6 +134,15 @@ const isAddNewCandidateDrawerVisible = ref(false);
 const isUpdateCandidateDrawerVisible = ref(false);
 const isCandidateInfoDialogVisible = ref(false);
 
+// Pages start
+
+// 👉 watching current page
+watch(currentPage, () => {
+  if (!isFetching.value) {
+    fetchData();
+  }
+});
+
 // 👉 Watching current page
 watchEffect(() => {
   if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
@@ -153,6 +155,8 @@ const paginationData = computed(() => {
 
   return `${firstIndex}-${lastIndex} of ${totalCandidates.value}`;
 });
+
+// Pages end
 
 // Edit
 const openEditDrawer = (id) => {
@@ -172,14 +176,14 @@ const handleCandidateOpen = (id) => {
   <section>
     <VRow>
       <VCol cols="12">
-        <VCard title="Search Filters">
+        <VCard title="Фильтры поиска">
           <VDivider />
 
           <VCardText class="d-flex flex-wrap">
             <VCol cols="3" sm="3">
               <VSelect
                 v-model="selectedState"
-                label="Select State"
+                label="Выберите статус"
                 :items="states_list"
                 item-title="name_ru"
                 item-value="id"
@@ -191,7 +195,7 @@ const handleCandidateOpen = (id) => {
             <VCol cols="3" sm="3">
               <VSelect
                 v-model="selectedGender"
-                label="Select Gender"
+                label="Выберите пол"
                 :items="gender_list"
                 clearable
                 clear-icon="bx-x"
@@ -207,11 +211,11 @@ const handleCandidateOpen = (id) => {
               <VTextField
                 v-model="searchQuery"
                 @keyup.enter="searchElements"
-                placeholder="Search Candidate"
+                placeholder="Поиск кандидата"
                 density="compact"
                 class="me-6"
               />
-              <VBtn @click="isAddNewCandidateDrawerVisible = true"> Add new Candidate </VBtn>
+              <VBtn @click="isAddNewCandidateDrawerVisible = true"> Добавить кандидата </VBtn>
             </VCol>
 
             <!-- </div> -->
@@ -223,12 +227,12 @@ const handleCandidateOpen = (id) => {
             <thead>
               <tr>
                 <th style="width: 48px">ID</th>
-                <th>FULL NAME</th>
-                <th>AGE</th>
-                <th>ADDRESS</th>
-                <th>PHONE NUMBER</th>
-                <th>STATE</th>
-                <th>ACTIONS</th>
+                <th>ПОЛНОЕ ИМЯ</th>
+                <th>ВОЗРАСТ</th>
+                <th>АДРЕС</th>
+                <th>НОМЕР ТЕЛЕФОНА</th>
+                <th>СТАТУС</th>
+                <th>ДЕЙСТВИЯ</th>
               </tr>
             </thead>
 
@@ -297,7 +301,7 @@ const handleCandidateOpen = (id) => {
 
             <tfoot v-show="!isFetching && !candidates.length">
               <tr>
-                <td colspan="7" class="text-center text-body-1">No data available</td>
+                <td colspan="7" class="text-center text-body-1">Нет доступных данных</td>
               </tr>
             </tfoot>
           </VTable>

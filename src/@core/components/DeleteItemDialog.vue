@@ -9,8 +9,7 @@
       <br /><br />
       <VCardText class="text-center">
         <p class="text-xl font-weight-medium mb-2">
-          Siz haqiqadan ham <span style="color: red">{{ role.name }}</span
-          >ni o'chirib yubormoqchimisiz?
+          Вы действительно хотите удалить <span style="color: red">{{ role.name }}</span>?
         </p>
         <VRow>
           <VCol cols="12" class="d-flex flex-wrap justify-center gap-4">
@@ -20,11 +19,11 @@
               @click="deleteItem"
               :loading="props.isDeleting ?? false"
             >
-              Submit
+              Подтвердить
             </VBtn>
 
             <VBtn color="secondary" variant="tonal" @click="updateIsDialogVisible(false)">
-              Cancel
+              Отмена
             </VBtn>
           </VCol>
         </VRow>
@@ -34,6 +33,7 @@
     </VCard>
   </VDialog>
 </template>
+
 
 <script setup>
 import DialogCloseBtn from '@core/components/DialogCloseBtn.vue';

@@ -13,7 +13,7 @@ const isFetching = ref(false);
 const rowPerPage = ref(10);
 const currentPage = ref(1);
 const totalPage = ref(1);
-const totalEmployees = ref(0);
+const totalCompanies = ref(0);
 const companies = ref([]);
 const updateID = ref(0);
 
@@ -34,7 +34,7 @@ const fetchData = async (force = false) => {
     companies.value = companies_r.data['companies'];
     lastFetchedPage.value = currentPage.value; // Сохраняем последнюю загруженную страницу
     currentPage.value = companies_r.data['meta']['current_page'];
-    totalEmployees.value = companies_r.data['meta']['total'];
+    totalCompanies.value = companies_r.data['meta']['total'];
     totalPage.value = companies_r.data['meta']['last_page'];
     rowPerPage.value = companies_r.data['meta']['per_page'];
   } catch (error) {
@@ -43,13 +43,6 @@ const fetchData = async (force = false) => {
     isFetching.value = false;
   }
 };
-
-// 👉 watching current page
-watch(currentPage, () => {
-  if (!isFetching.value) {
-    fetchData();
-  }
-});
 
 // search
 const searchElements = async () => {
@@ -75,6 +68,13 @@ const isUpdateCompanyDrawerVisible = ref(false);
 
 // Pages start
 
+// 👉 watching current page
+watch(currentPage, () => {
+  if (!isFetching.value) {
+    fetchData();
+  }
+});
+
 // 👉 Watching current page
 watchEffect(() => {
   if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
@@ -85,7 +85,7 @@ const paginationData = computed(() => {
   const firstIndex = companies.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0;
   const lastIndex = companies.value.length + (currentPage.value - 1) * rowPerPage.value;
 
-  return `${firstIndex}-${lastIndex} of ${totalEmployees.value}`;
+  return `${firstIndex}-${lastIndex} of ${totalCompanies.value}`;
 });
 
 // Pages end
@@ -132,7 +132,7 @@ const deleteItem = async function (id) {
   <section>
     <VRow>
       <VCol cols="12">
-        <VCard title="Search Filters">
+        <VCard title="Фильтры поиска">
           <DeleteItemDialog
             @confirm="deleteItem"
             :isDialogVisible="isDialogVisible"
@@ -148,11 +148,11 @@ const deleteItem = async function (id) {
               <VTextField
                 v-model="searchQuery"
                 @keyup.enter="searchElements"
-                placeholder="Search Employee"
+                placeholder="Поиск сотрудника"
                 density="compact"
                 class="me-6"
               />
-              <VBtn @click="isAddNewCompanyDrawerVisible = true"> Add new Company </VBtn>
+              <VBtn @click="isAddNewCompanyDrawerVisible = true"> Добавить новую компанию </VBtn>
             </VCol>
           </VCardText>
 
@@ -162,9 +162,9 @@ const deleteItem = async function (id) {
             <thead>
               <tr>
                 <th style="width: 48px">ID</th>
-                <th>NAME</th>
-                <th>PHONE</th>
-                <th>ACTIONS</th>
+                <th>ИМЯ</th>
+                <th>ТЕЛЕФОН</th>
+                <th>ДЕЙСТВИЯ</th>
               </tr>
             </thead>
 
@@ -199,7 +199,7 @@ const deleteItem = async function (id) {
 
             <tfoot v-if="!isFetching && !companies.length">
               <tr>
-                <td colspan="7" class="text-center text-body-1">No data available</td>
+                <td colspan="7" class="text-center text-body-1">Нет доступных данных</td>
               </tr>
             </tfoot>
           </VTable>
@@ -234,6 +234,7 @@ const deleteItem = async function (id) {
     />
   </section>
 </template>
+
 
 <style lang="scss">
 .app-user-search-filter {

@@ -48,13 +48,6 @@ const fetchData = async (force = false) => {
   }
 };
 
-// 👉 watching current page
-watch(currentPage, () => {
-  if (!isFetching.value) {
-    fetchData();
-  }
-});
-
 // search
 const searchElements = async () => {
   finalSearch.value = searchQuery.value;
@@ -76,6 +69,13 @@ onMounted(() => {
 
 // Pages start
 
+// 👉 watching current page
+watch(currentPage, () => {
+  if (!isFetching.value) {
+    fetchData();
+  }
+});
+
 // 👉 Watching current page
 watchEffect(() => {
   if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
@@ -83,10 +83,10 @@ watchEffect(() => {
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = job_positions?.value.length
+  const firstIndex = job_positions.value.length
     ? (currentPage.value - 1) * rowPerPage.value + 1
     : 0;
-  const lastIndex = job_positions?.value.length + (currentPage.value - 1) * rowPerPage.value;
+  const lastIndex = job_positions.value.length + (currentPage.value - 1) * rowPerPage.value;
 
   return `${firstIndex}-${lastIndex} of ${totalElements.value}`;
 });
@@ -191,7 +191,7 @@ const deleteItem = async function (id) {
   <section>
     <VRow>
       <VCol cols="12">
-        <VCard title="Search Filters">
+        <VCard title="Фильтры поиска">
           <DeleteItemDialog
             @confirm="deleteItem"
             :isDialogVisible="isDialogVisible"
@@ -204,7 +204,7 @@ const deleteItem = async function (id) {
             <!-- <VCol cols="2">
               <VSelect
                 v-model="selectedState"
-                label="Select State"
+                label="Выберите статус"
                 :items="states_list"
                 item-title="name_ru"
                 item-value="id"
@@ -215,7 +215,7 @@ const deleteItem = async function (id) {
             <VCol cols="3" sm="3">
               <VSelect
                 v-model="selectedCompany"
-                label="Select Company"
+                label="Выберите компанию"
                 :items="companies_list"
                 item-title="title"
                 item-value="id"
@@ -226,7 +226,7 @@ const deleteItem = async function (id) {
             <VCol cols="3" sm="3">
               <VSelect
                 v-model="selectedJobPosition"
-                label="Select Job Position"
+                label="Выберите должность"
                 :items="job_positions_list"
                 item-title="name_ru"
                 item-value="id"
@@ -240,11 +240,13 @@ const deleteItem = async function (id) {
               <VTextField
                 v-model="searchQuery"
                 @keyup.enter="searchElements"
-                placeholder="Search Job"
+                placeholder="Поиск должности"
                 density="compact"
                 class="me-6"
               />
-              <VBtn @click="isAddNewJobPositionDrawerVisible = true"> Add new Job Position </VBtn>
+              <VBtn @click="isAddNewJobPositionDrawerVisible = true">
+                Добавить новую должность
+              </VBtn>
             </VCol>
           </VCardText>
 
@@ -254,8 +256,8 @@ const deleteItem = async function (id) {
             <thead>
               <tr>
                 <th style="width: 48px">ID</th>
-                <th>TITLE</th>
-                <th>ACTIONS</th>
+                <th>НАЗВАНИЕ</th>
+                <th>ДЕЙСТВИЯ</th>
               </tr>
             </thead>
 
@@ -290,7 +292,7 @@ const deleteItem = async function (id) {
 
             <tfoot v-if="!isFetching && !job_positions.length">
               <tr>
-                <td colspan="7" class="text-center text-body-1">No data available</td>
+                <td colspan="7" class="text-center text-body-1">Данные отсутствуют</td>
               </tr>
             </tfoot>
           </VTable>

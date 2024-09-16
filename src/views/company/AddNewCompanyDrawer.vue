@@ -81,14 +81,13 @@ const handleDrawerModelValueUpdate = (val) => {
     :model-value="props.isDrawerOpen"
     @update:model-value="handleDrawerModelValueUpdate"
   >
-    <!-- 👉 Title -->
-    <AppDrawerHeaderSection title="Add Company" @cancel="closeNavigationDrawer" />
+    <!-- Раздел заголовка -->
+    <AppDrawerHeaderSection title="Добавить компанию" @cancel="closeNavigationDrawer" />
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
         <VCardText>
-          <!-- 👉 Form -->
-
+          <!-- Раздел формы -->
           <VForm
             ref="refForm"
             v-model="isFormValid"
@@ -96,27 +95,32 @@ const handleDrawerModelValueUpdate = (val) => {
             :disabled="isFetching"
           >
             <VRow>
+              <!-- Поле заголовка -->
               <VCol cols="12">
-                <VTextField v-model="title" :rules="[requiredValidator]" label="Title" />
+                <VTextField v-model="title" :rules="[requiredValidator]" label="Заголовок" />
               </VCol>
+
+              <!-- Поле номера телефона -->
               <VCol cols="12">
                 <VTextField
                   v-model="phone_number"
                   :rules="[requiredValidator]"
-                  label="Phone number"
+                  label="Номер телефона"
                 />
               </VCol>
+
+              <!-- Поле описания -->
               <VCol cols="12">
-                <VTextarea label="Description" v-model="description" />
+                <VTextarea label="Описание" v-model="description" />
               </VCol>
 
-              <!-- 👉 Submit and Cancel -->
+              <!-- Кнопки "Отправить" и "Отмена" -->
               <VCol cols="12">
                 <VBtn :loading="isFetching" :disabled="isFetching" type="submit" class="me-3">
-                  Submit
+                  Отправить
                 </VBtn>
                 <VBtn type="reset" variant="tonal" color="secondary" @click="closeNavigationDrawer">
-                  Cancel
+                  Отмена
                 </VBtn>
               </VCol>
             </VRow>
@@ -126,3 +130,5 @@ const handleDrawerModelValueUpdate = (val) => {
     </PerfectScrollbar>
   </VNavigationDrawer>
 </template>
+
+

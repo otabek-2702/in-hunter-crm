@@ -88,6 +88,13 @@ const isAddNewVacancyDrawerVisible = ref(false);
 
 // Pages start
 
+// 👉 watching current page
+watch(currentPage, () => {
+  if (!isFetching.value) {
+    fetchData();
+  }
+});
+
 // 👉 Watching current page
 watchEffect(() => {
   if (currentPage.value > totalPage.value) currentPage.value = totalPage.value;
@@ -196,7 +203,7 @@ const resolveVacancyState = (state) => {
   <section>
     <VRow>
       <VCol cols="12">
-        <VCard title="Search Filters">
+        <VCard title="Фильтры поиска">
           <DeleteItemDialog
             @confirm="deleteItem"
             :isDialogVisible="isDialogVisible"
@@ -206,10 +213,21 @@ const resolveVacancyState = (state) => {
           />
 
           <VCardText class="d-flex flex-wrap">
+            <VCol cols="6"/>
+            <VCol cols="6" class="app-user-search-filter d-flex align-center flex-wrap">
+              <VTextField
+                v-model="searchQuery"
+                @keyup.enter="searchElements"
+                placeholder="Поиск вакансии"
+                density="compact"
+                class="me-6"
+              />
+              <VBtn @click="isAddNewVacancyDrawerVisible = true"> Добавить новую вакансию </VBtn>
+            </VCol>
             <VCol cols="2">
               <VSelect
                 v-model="selectedState"
-                label="Select State"
+                label="Выберите статус"
                 :items="states_list"
                 item-title="name_ru"
                 item-value="id"
@@ -220,7 +238,7 @@ const resolveVacancyState = (state) => {
             <VCol cols="3" sm="3">
               <VSelect
                 v-model="selectedCompany"
-                label="Select Company"
+                label="Выберите компанию"
                 :items="companies_list"
                 item-title="title"
                 item-value="id"
@@ -231,7 +249,7 @@ const resolveVacancyState = (state) => {
             <VCol cols="3" sm="3">
               <VSelect
                 v-model="selectedJobPosition"
-                label="Select Job Position"
+                label="Выберите должность"
                 :items="job_positions_list"
                 item-title="name_ru"
                 item-value="id"
@@ -241,16 +259,6 @@ const resolveVacancyState = (state) => {
             </VCol>
             <VSpacer />
 
-            <VCol cols="4" class="app-user-search-filter d-flex align-center">
-              <VTextField
-                v-model="searchQuery"
-                @keyup.enter="searchElements"
-                placeholder="Search Vacancy"
-                density="compact"
-                class="me-6"
-              />
-              <VBtn @click="isAddNewVacancyDrawerVisible = true"> Add new Vacancy </VBtn>
-            </VCol>
           </VCardText>
 
           <VDivider />
@@ -259,16 +267,16 @@ const resolveVacancyState = (state) => {
             <thead>
               <tr>
                 <th style="width: 48px">ID</th>
-                <th>COMPANY</th>
-                <th>JOB</th>
-                <th>STATE</th>
-                <th>ACTIONS</th>
+                <th>КОМПАНИЯ</th>
+                <th>ДОЛЖНОСТЬ</th>
+                <th>СТАТУС</th>
+                <th>ДЕЙСТВИЯ</th>
               </tr>
             </thead>
 
             <tbody>
               <tr v-for="(vacancy, i) in vacancies" :key="i">
-                <td>{{ i + 1 }}</td>
+                <td>{{ vacancy?.id }}</td>
                 <td>{{ vacancy?.company?.title }}</td>
                 <td>{{ vacancy.job_position?.name_ru }}</td>
                 <td>
@@ -296,7 +304,7 @@ const resolveVacancyState = (state) => {
 
             <tfoot v-if="!isFetching && !vacancies.length">
               <tr>
-                <td colspan="7" class="text-center text-body-1">No data available</td>
+                <td colspan="7" class="text-center text-body-1">Данные отсутствуют</td>
               </tr>
             </tfoot>
           </VTable>

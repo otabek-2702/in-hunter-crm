@@ -104,13 +104,13 @@ watch(
     :model-value="props.isDrawerOpen"
     @update:model-value="handleDrawerModelValueUpdate"
   >
-    <!-- 👉 Title -->
-    <AppDrawerHeaderSection title="Update Company" @cancel="closeNavigationDrawer" />
+    <!-- 👉 Заголовок -->
+    <AppDrawerHeaderSection title="Обновить компанию" @cancel="closeNavigationDrawer" />
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
         <VCardText>
-          <!-- 👉 Form -->
+          <!-- 👉 Форма -->
 
           <VForm
             ref="refForm"
@@ -121,26 +121,26 @@ watch(
           >
             <VRow>
               <VCol cols="12">
-                <VTextField v-model="title" :rules="[requiredValidator]" label="Title" />
+                <VTextField v-model="title" :rules="[requiredValidator]" label="Название" />
               </VCol>
               <VCol cols="12">
                 <VTextField
                   v-model="phone_number"
                   :rules="[requiredValidator]"
-                  label="Phone number"
+                  label="Номер телефона"
                 />
               </VCol>
               <VCol cols="12">
-                <VTextarea label="Description" v-model="description" />
+                <VTextarea label="Описание" v-model="description" />
               </VCol>
 
-              <!-- 👉 Submit and Cancel -->
+              <!-- 👉 Кнопки отправки и отмены -->
               <VCol cols="12">
                 <VBtn :loading="isFetching" :disabled="isFetching" type="submit" class="me-3">
-                  Submit
+                  Отправить
                 </VBtn>
                 <VBtn type="reset" variant="tonal" color="secondary" @click="closeNavigationDrawer">
-                  Cancel
+                  Отмена
                 </VBtn>
               </VCol>
             </VRow>
@@ -154,3 +154,4 @@ watch(
     </PerfectScrollbar>
   </VNavigationDrawer>
 </template>
+

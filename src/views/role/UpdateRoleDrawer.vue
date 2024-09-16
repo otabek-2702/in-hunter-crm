@@ -96,35 +96,35 @@ watch(
     :model-value="props.isDrawerOpen"
     @update:model-value="handleDrawerModelValueUpdate"
   >
-    <!-- 👉 Title -->
-    <AppDrawerHeaderSection title="Edit Role" @cancel="closeNavigationDrawer" />
+    <!-- 👉 Заголовок -->
+    <AppDrawerHeaderSection title="Редактировать роль" @cancel="closeNavigationDrawer" />
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
         <VCardText>
-          <!-- 👉 Form -->
+          <!-- 👉 Форма -->
           <VForm ref="refForm" v-model="isFormValid" @submit.prevent="onSubmit">
             <VRow>
               <VCol cols="12">
-                <VTextField v-model="name" :rules="[requiredValidator]" label="Name" />
+                <VTextField v-model="name" :rules="[requiredValidator]" label="Имя" />
               </VCol>
 
               <VCol cols="12">
-                <VTextField v-model="name_uz" :rules="[requiredValidator]" label="Name uz" />
+                <VTextField v-model="name_uz" :rules="[requiredValidator]" label="Имя (узб.)" />
               </VCol>
 
-              <!-- 👉 Full name -->
+              <!-- 👉 Полное имя -->
               <VCol cols="12">
-                <VTextField v-model="name_ru" :rules="[requiredValidator]" label="Name ru" />
+                <VTextField v-model="name_ru" :rules="[requiredValidator]" label="Имя (рус.)" />
               </VCol>
 
-              <!-- 👉 Role -->
+              <!-- 👉 Роль -->
               <VCol cols="12">
                 <VSelect
                   multiple
                   persistent-hint
                   v-model="permission"
-                  label="Select permission"
+                  label="Выберите разрешение"
                   :rules="[requiredValidator]"
                   :items="permissions"
                   item-title="name_ru"
@@ -132,11 +132,11 @@ watch(
                 />
               </VCol>
 
-              <!-- 👉 Submit and Cancel -->
+              <!-- 👉 Отправить и Отмена -->
               <VCol cols="12">
-                <VBtn type="submit" class="me-3"> Submit </VBtn>
+                <VBtn type="submit" class="me-3"> Отправить </VBtn>
                 <VBtn type="reset" variant="tonal" color="secondary" @click="closeNavigationDrawer">
-                  Cancel
+                  Отмена
                 </VBtn>
               </VCol>
             </VRow>
@@ -146,3 +146,4 @@ watch(
     </PerfectScrollbar>
   </VNavigationDrawer>
 </template>
+
