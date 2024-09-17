@@ -215,19 +215,17 @@ const timelineDate = (date) => {
   }-${dateTime.getFullYear()} ${dateTime.getHours()}:${dateTime.getMinutes()}`;
 };
 
-const resolveUserRoleVariant = (state_id) => {
-  let state = states_list?.value?.find((el) => el.id === state_id)?.slug;
-
+const resolveUserRoleVariant = (state) => {
   const roleMap = {
-    new: { color: 'primary', icon: 'bx-user' },
-    cancel: { color: 'warning', icon: 'bx-cog' },
-    archive: { color: 'secondary', icon: 'bx-cog' },
-    success: { color: 'success', icon: 'bx-doughnut-chart' },
-    invite: { color: 'info', icon: 'bx-pencil' },
-    block: { color: 'error', icon: 'bx-laptop' },
+    new: { color: 'primary' },
+    cancel: { color: 'warning' },
+    archive: { color: 'secondary' },
+    success: { color: 'success' },
+    invite: { color: 'info' },
+    block: { color: 'error' },
   };
 
-  return roleMap[state] || { color: 'primary', icon: 'bx-user' };
+  return roleMap[state] || { color: 'primary' };
 };
 
 const resolveUserRoleName = (state_id) =>
@@ -276,7 +274,7 @@ const resolveUserName = (id, label) => {
             <VCol cols="9">
               <VListItem>
                 <VListItemTitle>
-                  <span style="font-weight: 700; margin-inline-end: 4px">Полное имя:</span>
+                  <span style="font-weight: 700; margin-inline-end: 4px">Полное имя: </span>
                   <span
                     :style="{
                       fontSize: '1rem',
@@ -293,7 +291,7 @@ const resolveUserName = (id, label) => {
 
               <VListItem>
                 <VListItemTitle>
-                  <span style="font-weight: 700; margin-inline-end: 4px">Возраст:</span>
+                  <span style="font-weight: 700; margin-inline-end: 4px">Возраст: </span>
                   <span
                     :style="{
                       fontSize: '1rem',
@@ -310,7 +308,7 @@ const resolveUserName = (id, label) => {
 
               <VListItem>
                 <VListItemTitle>
-                  <span style="font-weight: 700; margin-inline-end: 4px">Ден рождения:</span>
+                  <span style="font-weight: 700; margin-inline-end: 4px">Ден рождения: </span>
                   <span
                     :style="{
                       fontSize: '1rem',
@@ -327,7 +325,7 @@ const resolveUserName = (id, label) => {
 
               <VListItem>
                 <VListItemTitle>
-                  <span style="font-weight: 700; margin-inline-end: 4px">Пол:</span>
+                  <span style="font-weight: 700; margin-inline-end: 4px">Пол: </span>
                   <span
                     :style="{
                       fontSize: '1rem',
@@ -350,7 +348,7 @@ const resolveUserName = (id, label) => {
               <VRow>
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Позитивные навыки:</span>
+                    <span style="font-weight: 700; margin-inline-end: 4px">Позитивные навыки: </span>
                     <span
                       :style="{
                         fontSize: '1rem',
@@ -367,7 +365,7 @@ const resolveUserName = (id, label) => {
 
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Платформы:</span>
+                    <span style="font-weight: 700; margin-inline-end: 4px">Платформы: </span>
                     <span
                       :style="{
                         fontSize: '1rem',
@@ -384,7 +382,7 @@ const resolveUserName = (id, label) => {
 
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Программы:</span>
+                    <span style="font-weight: 700; margin-inline-end: 4px">Программы: </span>
                     <span
                       :style="{
                         fontSize: '1rem',
@@ -401,7 +399,7 @@ const resolveUserName = (id, label) => {
 
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Номер телефона:</span>
+                    <span style="font-weight: 700; margin-inline-end: 4px">Номер телефона: </span>
                     <span
                       :style="{
                         fontSize: '1rem',
@@ -418,7 +416,7 @@ const resolveUserName = (id, label) => {
 
                 <!-- <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Языки:</span>
+                    <span style="font-weight: 700; margin-inline-end: 4px">Языки: </span>
                     <span
                       :style="{
                         fontSize: '1rem',
@@ -435,7 +433,7 @@ const resolveUserName = (id, label) => {
 
                  <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Add source:</span>
+                    <span style="font-weight: 700; margin-inline-end: 4px">Add source: </span>
                     <span
                       :style="{
                         fontSize: '1rem',
@@ -452,7 +450,7 @@ const resolveUserName = (id, label) => {
 
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Last works:</span>
+                    <span style="font-weight: 700; margin-inline-end: 4px">Last works: </span>
                     <span
                       :style="{
                         fontSize: '1rem',
@@ -469,7 +467,7 @@ const resolveUserName = (id, label) => {
 
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Marital state:</span>
+                    <span style="font-weight: 700; margin-inline-end: 4px">Marital state: </span>
                     <span
                       :style="{
                         fontSize: '1rem',
@@ -486,7 +484,7 @@ const resolveUserName = (id, label) => {
 
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">University:</span>
+                    <span style="font-weight: 700; margin-inline-end: 4px">University: </span>
                     <span
                       :style="{
                         fontSize: '1rem',
@@ -506,7 +504,7 @@ const resolveUserName = (id, label) => {
               <VRow>
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Языки:</span>
+                    <span style="font-weight: 700; margin-inline-end: 4px">Языки: </span>
                     <span
                       :style="{
                         fontSize: '1rem',
@@ -522,7 +520,7 @@ const resolveUserName = (id, label) => {
                 </VListItem>
                 <VListItem v-if="itemData.add_source">
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Add source:</span>
+                    <span style="font-weight: 700; margin-inline-end: 4px">Add source: </span>
                     <span
                       :style="{
                         fontSize: '1rem',
@@ -539,7 +537,7 @@ const resolveUserName = (id, label) => {
 
                 <VListItem v-if="itemData.last_work">
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Last works:</span>
+                    <span style="font-weight: 700; margin-inline-end: 4px">Last works: </span>
                     <span
                       :style="{
                         fontSize: '1rem',
@@ -556,7 +554,7 @@ const resolveUserName = (id, label) => {
 
                 <VListItem v-if="itemData.marital_state">
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Marital state:</span>
+                    <span style="font-weight: 700; margin-inline-end: 4px">Marital state: </span>
                     <span
                       :style="{
                         fontSize: '1rem',
@@ -573,7 +571,7 @@ const resolveUserName = (id, label) => {
 
                 <VListItem v-if="itemData.university_place">
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">University:</span>
+                    <span style="font-weight: 700; margin-inline-end: 4px">University: </span>
                     <span
                       :style="{
                         fontSize: '1rem',
@@ -603,26 +601,29 @@ const resolveUserName = (id, label) => {
                   >
                     <VTimelineItem
                       v-for="action in itemData.actions"
-                      :dot-color="timelineDotcolor(action.state_id)"
+                      :dot-color="timelineDotcolor(action.state.id)"
                       size="x-small"
                     >
                       <div class="d-flex justify-space-between align-center flex-wrap">
                         <h4 class="text-base font-weight-semibold me-1 mb-3">
                           #{{ action.id }}
                           <VChip
-                            :color="resolveUserRoleVariant(action.state_id).color"
+                            :color="resolveUserRoleVariant(action.state.slug).color"
                             density="compact"
                             label
                             class="text-uppercase"
                           >
-                            {{ resolveUserRoleName(action.state_id) }}
+                            {{ action.state.name_ru }}
                           </VChip>
                         </h4>
                         <span class="text-sm text-disabled text-no-wrap">{{
                           timelineDate(action.created_at)
                         }}</span>
                       </div>
-                      <p class="mb-2">{{ resolveUserName(action.user_id, action.name_ru) }}</p>
+                      <p class="mb-2">{{ action.user.name }} {{ action.name_ru }}</p>
+                      <div class="mt-2">
+                        <h6 class="font-weight-semibold text-sm">КоментарияЖ {{action.comment.message}}</h6>
+                      </div>
                     </VTimelineItem>
                   </VTimeline>
                 </VCardText>
