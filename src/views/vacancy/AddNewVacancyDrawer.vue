@@ -85,13 +85,13 @@ const handleDrawerModelValueUpdate = (val) => {
     :model-value="props.isDrawerOpen"
     @update:model-value="handleDrawerModelValueUpdate"
   >
-    <!-- 👉 Title -->
+    <!-- 👉 Заголовок -->
     <AppDrawerHeaderSection title="Добавить новую вакансию" @cancel="closeNavigationDrawer" />
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
         <VCardText>
-          <!-- 👉 Form -->
+          <!-- 👉 Форма -->
 
           <VForm
             ref="refForm"
@@ -103,7 +103,7 @@ const handleDrawerModelValueUpdate = (val) => {
               <VCol cols="12">
                 <VSelect
                   v-model="company_id"
-                  label="Select Company"
+                  label="Выберите компанию"
                   :items="props.companies_list"
                   item-title="title"
                   item-value="id"
@@ -115,7 +115,7 @@ const handleDrawerModelValueUpdate = (val) => {
               <VCol cols="12">
                 <VSelect
                   v-model="job_position_id"
-                  label="Select Job"
+                  label="Выберите должность"
                   :items="props.job_positions_list"
                   item-title="name_ru"
                   item-value="id"
@@ -125,19 +125,19 @@ const handleDrawerModelValueUpdate = (val) => {
               </VCol>
 
               <VCol cols="12">
-                <VTextField v-model="quantity" label="Count" type="number" />
+                <VTextField v-model="quantity" label="Количество" type="number" />
               </VCol>
               <VCol cols="12">
-                <VTextarea v-model="description" label="Description" />
+                <VTextarea v-model="description" label="Описание" />
               </VCol>
 
-              <!-- 👉 Submit and Cancel -->
+              <!-- 👉 Отправить и Отменить -->
               <VCol cols="12">
                 <VBtn :loading="isFetching" :disabled="isFetching" type="submit" class="me-3">
-                  Submit
+                  Отправить
                 </VBtn>
                 <VBtn type="reset" variant="tonal" color="secondary" @click="closeNavigationDrawer">
-                  Cancel
+                  Отменить
                 </VBtn>
               </VCol>
             </VRow>
@@ -147,3 +147,4 @@ const handleDrawerModelValueUpdate = (val) => {
     </PerfectScrollbar>
   </VNavigationDrawer>
 </template>
+
