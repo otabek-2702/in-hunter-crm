@@ -3,8 +3,8 @@ export default [
     title: 'Статистика',
     to: { name: 'Statistics' },
     icon: { icon: 'mdi-chart-areaspline' },
-    subject: 'post',
-    action: 'create'
+    subject: 'Statistics',
+    action: 'show'
   },
   {
     title: 'Роли',
