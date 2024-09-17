@@ -258,8 +258,8 @@ const resolveVacancyState = (state) => {
                 class="me-6"
               />
             </VCol>
-            <VCol cols="9" />
-            <VCol cols="3">
+            <VCol cols="8" />
+            <VCol cols="4">
               <VBtn @click="isAddNewVacancyDrawerVisible = true"> Добавить новую вакансию </VBtn>
             </VCol>
           </VCardText>

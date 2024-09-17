@@ -83,7 +83,6 @@ watch(
   (newVal) => newVal && fetchDataById(),
 );
 </script>
-
 <template>
   <VNavigationDrawer
     temporary
@@ -93,13 +92,13 @@ watch(
     :model-value="props.isDrawerOpen"
     @update:model-value="closeNavigationDrawer"
   >
-    <!-- 👉 Title -->
+    <!-- 👉 Заголовок -->
     <AppDrawerHeaderSection title="Изменить" @cancel="closeNavigationDrawer" />
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
         <VCardText>
-          <!-- 👉 Form -->
+          <!-- 👉 Форма -->
 
           <VForm
             ref="refForm"
@@ -110,20 +109,20 @@ watch(
           >
             <VRow>
               <VCol cols="12">
-                <VTextField v-model="name_uz" :rules="[requiredValidator]" label="Name uz" />
+                <VTextField v-model="name_uz" :rules="[requiredValidator]" label="Имя узб." />
               </VCol>
               
               <VCol cols="12">
-                <VTextField v-model="name_ru" :rules="[requiredValidator]" label="Name ru" />
+                <VTextField v-model="name_ru" :rules="[requiredValidator]" label="Имя рус." />
               </VCol>
 
-              <!-- 👉 Submit and Cancel -->
+              <!-- 👉 Отправить и Отменить -->
               <VCol cols="12">
                 <VBtn :loading="isFetching" :disabled="isFetching" type="submit" class="me-3">
-                  Submit
+                  Отправить
                 </VBtn>
                 <VBtn type="reset" variant="tonal" color="secondary" @click="closeNavigationDrawer">
-                  Cancel
+                  Отменить
                 </VBtn>
               </VCol>
             </VRow>

@@ -79,7 +79,7 @@ const handleDrawerModelValueUpdate = (val) => {
     @update:model-value="handleDrawerModelValueUpdate"
   >
     <!-- 👉 Заголовок -->
-    <AppDrawerHeaderSection title="Добавить компанию" @cancel="closeNavigationDrawer" />
+    <AppDrawerHeaderSection title="Добавить новую" @cancel="closeNavigationDrawer" />
 
     <PerfectScrollbar :options="{ wheelPropagation: false }">
       <VCard flat>
@@ -94,26 +94,20 @@ const handleDrawerModelValueUpdate = (val) => {
           >
             <VRow>
               <VCol cols="12">
-                <VTextField v-model="title" :rules="[requiredValidator]" label="Название" />
-              </VCol>
-              <VCol cols="12">
-                <VTextField
-                  v-model="phone_number"
-                  :rules="[requiredValidator]"
-                  label="Номер телефона"
-                />
-              </VCol>
-              <VCol cols="12">
-                <VTextarea label="Описание" v-model="description" />
+                <VTextField v-model="name_uz" :rules="[requiredValidator]" label="Имя узб." />
               </VCol>
 
-              <!-- 👉 Кнопки отправки и отмены -->
+              <VCol cols="12">
+                <VTextField v-model="name_ru" :rules="[requiredValidator]" label="Имя рус." />
+              </VCol>
+
+              <!-- 👉 Отправить и Отменить -->
               <VCol cols="12">
                 <VBtn :loading="isFetching" :disabled="isFetching" type="submit" class="me-3">
                   Отправить
                 </VBtn>
                 <VBtn type="reset" variant="tonal" color="secondary" @click="closeNavigationDrawer">
-                  Отмена
+                  Отменить
                 </VBtn>
               </VCol>
             </VRow>
