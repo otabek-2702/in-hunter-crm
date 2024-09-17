@@ -57,8 +57,8 @@ const fetchData = async () => {
 };
 
 const candidatePhoto = computed(() => {
-  if (photo.value) {
-    return '';
+  if (itemData.value.photo) {
+    return `https://api.inhunter.jasondev.uz/${itemData.value.photo}`;
   }
   return AccountImg;
 });
@@ -72,31 +72,13 @@ const fetchLanguages = async function () {
   }
 };
 
-const fetchState = async function () {
-  try {
-    const response = await axios.get('/states');
-    states_list.value = response.data.states;
-  } catch (error) {
-    console.error('Ошибка :', error);
-  }
-};
-const fetchUsers = async function () {
-  try {
-    const response = await axios.get('/users');
-    users_list.value = response.data.users;
-  } catch (error) {
-    console.error('Ошибка :', error);
-  }
-};
 
 watch(
   () => props.candidateId,
   (newVal) => {
     if (newVal) {
       fetchData();
-      fetchState();
       fetchLanguages();
-      fetchUsers();
     }
   },
 );
@@ -228,15 +210,7 @@ const resolveUserRoleVariant = (state) => {
   return roleMap[state] || { color: 'primary' };
 };
 
-const resolveUserRoleName = (state_id) =>
-  states_list?.value?.find((el) => el.id == state_id)?.name_ru;
 
-const resolveUserName = (id, label) => {
-  let name = users_list.value?.find((el) => (el.id = id))?.name;
-
-  console.log(`${name}${label}`);
-  return `${name}${label}`;
-};
 </script>
 
 <template>
@@ -589,6 +563,7 @@ const resolveUserName = (id, label) => {
             </VCol>
 
             <VCol cols="12">
+              <audio controls :src="`https://api.inhunter.jasondev.uz/${itemData.voice}`"></audio>
               <!-- 👉 Activity timeline -->
               <VCard title="User Activity Timeline">
                 <VCardText>
