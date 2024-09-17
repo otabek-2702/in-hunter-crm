@@ -4,6 +4,7 @@ import axios from '@axios';
 import DialogCloseBtn from '@core/components/DialogCloseBtn.vue';
 import { toast } from 'vue3-toastify';
 import { watch } from 'vue';
+import { onMounted } from 'vue';
 
 const props = defineProps({
   id: {
@@ -16,6 +17,7 @@ const emit = defineEmits(['fetchDatas']);
 
 const isDialogVisible = ref(false);
 const isFetching = ref(false);
+const isFetchingVacancy = ref(false);
 const comment = ref();
 const selectedCompany = ref();
 const selectedVacancy = ref();
@@ -63,6 +65,8 @@ const vacancies_list = ref([]);
 
 const fetchVacancies = async () => {
   try {
+    vacancies_list.value = []
+    isFetchingVacancy.value = true  
     const response = await axios.get(`/vacancies?company_id=${selectedCompany.value}`);
     const vacancies = await response.data?.vacancies;
     if (vacancies.length) {
@@ -82,14 +86,19 @@ const fetchVacancies = async () => {
     }
   } catch (error) {
     console.error('Ошибка :', error);
+  }finally {
+    isFetchingVacancy.value = false  
   }
 };
 watch(selectedCompany, (newVal) => {
   if (newVal) {
     fetchVacancies();
-    fetchCompanies()
+  } else {
+    vacancies_list.value = []
   }
 });
+
+onMounted(()=> fetchCompanies())
 
 const isFetching1 = ref(false);
 const isFetching2 = ref(false);
@@ -198,9 +207,9 @@ const onArchive = async () => {
               clear-icon="bx-x"
             />
           </VCol>
-          <VCol cols="6">
+          <VCol cols="6" class="d-flex justify-center align-center">
             <VSelect
-              v-if="vacancies_list.length"
+              v-if="vacancies_list.length && !isFetchingVacancy"
               v-model="selectedVacancy"
               label="Выберите вакансию"
               :items="vacancies_list"
@@ -210,6 +219,9 @@ const onArchive = async () => {
               clear-icon="bx-x"
               aria-selected="true"
             />
+            <VProgressCircular v-if="isFetchingVacancy && !vacancies_list.length" color="primary" indeterminate></VProgressCircular>
+            <span v-if="!isFetchingVacancy && !vacancies_list.length" style="font-weight: 700; margin-inline-end: 4px">Компания не выбрана</span>
+            
           </VCol>
 
           <!-- 👉 Отправить и Отмена -->
