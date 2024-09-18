@@ -237,7 +237,7 @@ const deleteItem = async function (id) {
                 </td>
 
                 <td class="text-capitalize text-high-emphasis">
-                  <VRow>
+                  <VRow class="m-0 pa-2 gap-2">
                     <VChip
                       v-for="permission in role.permissions"
                       color="success"
