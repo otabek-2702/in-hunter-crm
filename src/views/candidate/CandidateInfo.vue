@@ -72,7 +72,6 @@ const fetchLanguages = async function () {
   }
 };
 
-
 watch(
   () => props.candidateId,
   (newVal) => {
@@ -190,11 +189,14 @@ const timelineDotcolor = (id) => {
   }
 };
 
-const timelineDate = (date) => {
-  const dateTime = new Date(date);
-  return `${dateTime.getDate()}-${
-    dateTime.getMonth() + 1
-  }-${dateTime.getFullYear()} ${dateTime.getHours()}:${dateTime.getMinutes()}`;
+const timelineDate = (data) => {
+  const dateTime = new Date(data);
+  const date = (dateTime.getDate() + 1).toString().length < 2 ? `0${(dateTime.getDate() + 1)}` : (dateTime.getDate() + 1);
+  const month = (dateTime.getMonth() + 1).toString().length < 2 ? `0${(dateTime.getMonth() + 1)}` : (dateTime.getMonth() + 1);
+  const year = dateTime.getFullYear();
+  const hour = (dateTime.getHours() + 1).toString().length < 2 ? `0${(dateTime.getHours() + 1)}` : (dateTime.getHours() + 1);
+  const minute = (dateTime.getMinutes() + 1).toString().length < 2 ? `0${(dateTime.getMinutes() + 1)}` : (dateTime.getMinutes() + 1);
+  return `${date}-${month}-${year} ${hour}:${minute}`;
 };
 
 const resolveUserRoleVariant = (state) => {
@@ -209,8 +211,6 @@ const resolveUserRoleVariant = (state) => {
 
   return roleMap[state] || { color: 'primary' };
 };
-
-
 </script>
 
 <template>
@@ -322,7 +322,9 @@ const resolveUserRoleVariant = (state) => {
               <VRow>
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Позитивные навыки: </span>
+                    <span style="font-weight: 700; margin-inline-end: 4px"
+                      >Позитивные навыки:
+                    </span>
                     <span
                       :style="{
                         fontSize: '1rem',
@@ -597,7 +599,9 @@ const resolveUserRoleVariant = (state) => {
                       </div>
                       <p class="mb-2">{{ action.user.name }} {{ action.name_ru }}</p>
                       <div class="mt-2">
-                        <h6 class="font-weight-semibold text-sm">КоментарияЖ {{action.comment.message}}</h6>
+                        <h6 class="font-weight-semibold text-sm">
+                          Коментария: {{ action.comment.message }}
+                        </h6>
                       </div>
                     </VTimelineItem>
                   </VTimeline>
