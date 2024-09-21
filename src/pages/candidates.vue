@@ -7,7 +7,9 @@ import ChangeStateCandidate from '@/views/candidate/ChangeStateCandidate.vue';
 import Skeleton from '@/views/skeleton/Skeleton.vue';
 import CandidateInfo from '@/views/candidate/CandidateInfo.vue';
 import CandidateAccept from '@/views/candidate/CandidateAccept.vue';
+import { useAppAbility } from '@/plugins/casl/useAppAbility';
 
+const { can } = useAppAbility();
 const searchQuery = ref('');
 const finalSearch = ref('');
 const rowPerPage = ref(10);
@@ -167,8 +169,10 @@ const openEditDrawer = (id) => {
 const candidateViewId = ref(0);
 
 const handleCandidateOpen = (id) => {
-  candidateViewId.value = id;
-  isCandidateInfoDialogVisible.value = true;
+  if(can('show', 'Candidate')) {
+    candidateViewId.value = id;
+    isCandidateInfoDialogVisible.value = true;
+  }
 };
 </script>
 
@@ -215,7 +219,9 @@ const handleCandidateOpen = (id) => {
                 density="compact"
                 class="me-6"
               />
-              <VBtn @click="isAddNewCandidateDrawerVisible = true"> Добавить кандидата </VBtn>
+              <Can I="add" a="Role">
+                <VBtn @click="isAddNewCandidateDrawerVisible = true"> Добавить кандидата </VBtn>
+              </Can>
             </VCol>
 
             <!-- </div> -->
@@ -232,14 +238,21 @@ const handleCandidateOpen = (id) => {
                 <th>АДРЕС</th>
                 <th>НОМЕР ТЕЛЕФОНА</th>
                 <th>СТАТУС</th>
-                <th>ДЕЙСТВИЯ</th>
+                <th
+                  v-if="
+                    (can('update', 'Role') || can('change', 'Candidatestate')) &&
+                    !candidates?.every((e) => e.state?.slug === 'success' || e.state?.slug === 'block' || e.state?.slug === 'cancel')
+                  "
+                >
+                  ДЕЙСТВИЯ
+                </th>
               </tr>
             </thead>
 
             <tbody>
               <tr
                 @click="() => handleCandidateOpen(candidate.id)"
-                :style="{ cursor: 'pointer' }"
+                :style="{ cursor: can('show', 'Candidate') ? 'pointer' : 'auto' }"
                 v-for="candidate in candidates"
                 :key="candidate.id"
               >
@@ -260,40 +273,54 @@ const handleCandidateOpen = (id) => {
                     {{ candidate.state.name_ru }}
                   </VChip>
                 </td>
-                <td class="text-center" :style="{ width: '80px', zIndex: '10' }">
-                  <VIcon
-                    @click="
-                      (event) => {
-                        event.stopPropagation();
-                        openEditDrawer(candidate.id);
-                      }
-                    "
-                    v-if="!(candidate.state.slug === 'cancel' || candidate.state.slug === 'block')"
-                    size="30"
-                    icon="bx-edit-alt"
-                    style="color: rgb(var(--v-global-theme-primary))"
-                  ></VIcon>
+                <td
+                  class="text-center"
+                  :style="{ width: '80px', zIndex: '10' }"
+                  v-if="can('update', 'Role') || can('change', 'Candidatestate')"
+                >
+                  <Can I="update" a="Role">
+                    <VIcon
+                      @click="
+                        (event) => {
+                          event.stopPropagation();
+                          openEditDrawer(candidate.id);
+                        }
+                      "
+                      v-if="
+                        !(
+                          candidate.state.slug === 'cancel' ||
+                          candidate.state.slug === 'block' ||
+                          candidate.state.slug === 'success'
+                        )
+                      "
+                      size="30"
+                      icon="bx-edit-alt"
+                      style="color: rgb(var(--v-global-theme-primary))"
+                    ></VIcon>
+                  </Can>
 
-                  <ChangeStateCandidate
-                    v-if="
-                      !(
-                        candidate.state.slug === 'cancel' ||
-                        candidate.state.slug === 'block' ||
-                        candidate.state.slug === 'invite' ||
-                        candidate.state.slug === 'success'
-                      )
-                    "
-                    @fetchDatas="() => fetchData(true)"
-                    :isDialogVisible="true"
-                    :id="candidate.id"
-                    :state_slug="candidate.state.slug"
-                  />
-                  <CandidateAccept
-                    v-if="candidate.state.slug === 'invite'"
-                    @fetchDatas="() => fetchData(true)"
-                    :isDialogVisible="true"
-                    :id="candidate.id"
-                  />
+                  <Can I="change" a="Candidatestate">
+                    <ChangeStateCandidate
+                      v-if="
+                        !(
+                          candidate.state.slug === 'cancel' ||
+                          candidate.state.slug === 'block' ||
+                          candidate.state.slug === 'invite' ||
+                          candidate.state.slug === 'success'
+                        )
+                      "
+                      @fetchDatas="() => fetchData(true)"
+                      :isDialogVisible="true"
+                      :id="candidate.id"
+                      :state_slug="candidate.state.slug"
+                    />
+                    <CandidateAccept
+                      v-if="candidate.state.slug === 'invite'"
+                      @fetchDatas="() => fetchData(true)"
+                      :isDialogVisible="true"
+                      :id="candidate.id"
+                    />
+                  </Can>
                 </td>
               </tr>
             </tbody>

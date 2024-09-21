@@ -4,10 +4,11 @@ import axios from '@axios';
 import AddNewJobPositionDrawer from '@/views/job_position/AddNewJobPositionDrawer.vue';
 import Skeleton from '@/views/skeleton/Skeleton.vue';
 import DeleteItemDialog from '@/@core/components/DeleteItemDialog.vue';
-import { VChip } from 'vuetify/components';
 import UpdateJobPositionDrawer from '@/views/job_position/UpdateJobPositionDrawer.vue';
 import { toast } from 'vue3-toastify';
+import { useAppAbility } from '@/plugins/casl/useAppAbility';
 
+const { can } = useAppAbility();
 const searchQuery = ref('');
 const finalSearch = ref('');
 const rowPerPage = ref(10);
@@ -244,9 +245,11 @@ const deleteItem = async function (id) {
                 density="compact"
                 class="me-6"
               />
-              <VBtn @click="isAddNewJobPositionDrawerVisible = true">
-                Добавить новую должность
-              </VBtn>
+              <Can I="add" a="Jobposition">
+                <VBtn @click="isAddNewJobPositionDrawerVisible = true">
+                  Добавить новую должность
+                </VBtn>
+              </Can>
             </VCol>
           </VCardText>
 
@@ -257,7 +260,7 @@ const deleteItem = async function (id) {
               <tr>
                 <th style="width: 48px">ID</th>
                 <th>НАЗВАНИЕ</th>
-                <th>ДЕЙСТВИЯ</th>
+                <th v-if="can('update', 'Jobposition') || can('delete', 'Jobposition')">ДЕЙСТВИЯ</th>
               </tr>
             </thead>
 
@@ -266,24 +269,32 @@ const deleteItem = async function (id) {
                 <td>{{ i + 1 }}</td>
                 <td>{{ job_position?.name_ru }}</td>
 
-                <td class="text-center" style="width: 80px">
-                  <VIcon
-                    @click="
-                      (event) => {
-                        event.stopPropagation();
-                        openEditDrawer(job_position.id);
-                      }
-                    "
-                    size="30"
-                    icon="bx-edit-alt"
-                    style="color: rgb(var(--v-global-theme-primary))"
-                  ></VIcon>
-                  <VIcon
-                    size="30"
-                    icon="bx-trash"
-                    style="color: red"
-                    @click="confirmDelete(job_position.id, job_position.title)"
-                  ></VIcon>
+                <td
+                  class="text-center"
+                  style="width: 80px"
+                  v-if="can('update', 'Jobposition') || can('delete', 'Jobposition')"
+                >
+                  <Can I="update" a="Jobposition">
+                    <VIcon
+                      @click="
+                        (event) => {
+                          event.stopPropagation();
+                          openEditDrawer(job_position.id);
+                        }
+                      "
+                      size="30"
+                      icon="bx-edit-alt"
+                      style="color: rgb(var(--v-global-theme-primary))"
+                    ></VIcon>
+                  </Can>
+                  <Can I="delete" a="Jobposition">
+                    <VIcon
+                      size="30"
+                      icon="bx-trash"
+                      style="color: red"
+                      @click="confirmDelete(job_position.id, job_position.title)"
+                    ></VIcon>
+                  </Can>
                 </td>
               </tr>
             </tbody>

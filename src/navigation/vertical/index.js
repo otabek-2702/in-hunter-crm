@@ -24,7 +24,7 @@ export default [
     title: 'Сотрудники',
     to: { name: 'Employees' },
     icon: { icon: 'mdi-account-tie' },
-    subject: 'Employees',
+    subject: 'Users',
     action: 'show'
   },
   {
@@ -45,7 +45,7 @@ export default [
     title: 'Должности',
     to: { name: 'Jobs' },
     icon: { icon: 'mdi-briefcase' },
-    subject: 'Jobs',
+    subject: 'Jobpositions',
     action: 'show'
   },
 ]

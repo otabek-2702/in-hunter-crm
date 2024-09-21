@@ -6,7 +6,9 @@ import Skeleton from '@/views/skeleton/Skeleton.vue';
 import DeleteItemDialog from '@/@core/components/DeleteItemDialog.vue';
 import { VChip } from 'vuetify/components';
 import { toast } from 'vue3-toastify';
+import { useAppAbility } from '@/plugins/casl/useAppAbility';
 
+const { can } = useAppAbility();
 const searchQuery = ref();
 const finalSearch = ref('');
 const rowPerPage = ref(10);
@@ -255,13 +257,14 @@ const resolveVacancyState = (state) => {
                 @keyup.enter="searchElements"
                 placeholder="Поиск вакансии"
                 density="compact"
-                class="me-6"
               />
             </VCol>
-            <VCol cols="8" />
-            <VCol cols="4">
-              <VBtn @click="isAddNewVacancyDrawerVisible = true"> Добавить новую вакансию </VBtn>
-            </VCol>
+            <Can I="add" a="Vacancy">
+              <VCol cols="12" class="d-flex">
+                <VSpacer />
+                <VBtn @click="isAddNewVacancyDrawerVisible = true"> Добавить новую вакансию </VBtn>
+              </VCol>
+            </Can>
           </VCardText>
 
           <VDivider />
@@ -273,7 +276,7 @@ const resolveVacancyState = (state) => {
                 <th>КОМПАНИЯ</th>
                 <th>ДОЛЖНОСТЬ</th>
                 <th>СТАТУС</th>
-                <th>ДЕЙСТВИЯ</th>
+                <th v-if="can('delete', 'Vacancy')">ДЕЙСТВИЯ</th>
               </tr>
             </thead>
 
@@ -292,13 +295,15 @@ const resolveVacancyState = (state) => {
                     {{ vacancy.state.name_ru }}
                   </VChip>
                 </td>
-                <td class="text-center" style="width: 80px">
-                  <VIcon
-                    size="30"
-                    icon="bx-trash"
-                    style="color: red"
-                    @click="confirmDelete(vacancy.id, vacancy.title)"
-                  ></VIcon>
+                <td class="text-center" style="width: 80px" v-if="can('delete', 'Vacancy')">
+                  <Can I="delete" a="Vacancy">
+                    <VIcon
+                      size="30"
+                      icon="bx-trash"
+                      style="color: red"
+                      @click="confirmDelete(vacancy.id, vacancy.title)"
+                    ></VIcon>
+                  </Can>
                 </td>
               </tr>
             </tbody>
