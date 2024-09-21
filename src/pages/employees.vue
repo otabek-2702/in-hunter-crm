@@ -182,7 +182,7 @@ const deleteItem = async function (id) {
                 <td
                   class="text-center"
                   style="width: 80px"
-                  v-if="can('update', 'User') || can('delete', 'User')"
+                 
                 >
                   <Can I="update" a="User">
                     <VIcon

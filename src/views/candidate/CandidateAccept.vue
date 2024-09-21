@@ -65,40 +65,55 @@ const vacancies_list = ref([]);
 
 const fetchVacancies = async () => {
   try {
-    vacancies_list.value = []
-    isFetchingVacancy.value = true  
+    vacancies_list.value = [];
+    isFetchingVacancy.value = true;
     const response = await axios.get(`/vacancies?company_id=${selectedCompany.value}`);
     const vacancies = await response.data?.vacancies;
     if (vacancies.length) {
       selectedVacancy.value = null;
-      vacancies_list.value = vacancies?.map((el) => ({
-        id: el.id,
-        job_position_name_ru: el.job_position.name_ru,
-      }));
+      vacancies_list.value = vacancies
+        ?.map((el) => {
+          if (el.state.id == 7) {
+            return {
+              id: el.id,
+              job_position_name_ru: el.job_position.name_ru,
+            };
+          }
+        })
+        .filter(Boolean);
+      if (!vacancies_list.value.length) {
+        selectedVacancy.value = 0;
+        vacancies_list.value = [
+          {
+            id: 0,
+            job_position_name_ru: 'Нет открытых вакансий в этой компании.',
+          },
+        ];
+      }
     } else {
       selectedVacancy.value = 0;
       vacancies_list.value = [
         {
           id: 0,
-          job_position_name_ru: 'Нет вакансий в этой компании.',
+          job_position_name_ru: 'Нет открытых вакансий в этой компании.',
         },
       ];
     }
   } catch (error) {
     console.error('Ошибка :', error);
-  }finally {
-    isFetchingVacancy.value = false  
+  } finally {
+    isFetchingVacancy.value = false;
   }
 };
 watch(selectedCompany, (newVal) => {
   if (newVal) {
     fetchVacancies();
   } else {
-    vacancies_list.value = []
+    vacancies_list.value = [];
   }
 });
 
-onMounted(()=> fetchCompanies())
+onMounted(() => fetchCompanies());
 
 const isFetching1 = ref(false);
 const isFetching2 = ref(false);
@@ -219,9 +234,16 @@ const onArchive = async () => {
               clear-icon="bx-x"
               aria-selected="true"
             />
-            <VProgressCircular v-if="isFetchingVacancy && !vacancies_list.length" color="primary" indeterminate></VProgressCircular>
-            <span v-if="!isFetchingVacancy && !vacancies_list.length" style="font-weight: 700; margin-inline-end: 4px">Компания не выбрана</span>
-            
+            <VProgressCircular
+              v-if="isFetchingVacancy && !vacancies_list.length"
+              color="primary"
+              indeterminate
+            ></VProgressCircular>
+            <span
+              v-if="!isFetchingVacancy && !vacancies_list.length"
+              style="font-weight: 700; margin-inline-end: 4px"
+              >Компания не выбрана</span
+            >
           </VCol>
 
           <!-- 👉 Отправить и Отмена -->

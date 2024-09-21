@@ -295,7 +295,7 @@ const resolveVacancyState = (state) => {
                     {{ vacancy.state.name_ru }}
                   </VChip>
                 </td>
-                <td class="text-center" style="width: 80px" v-if="can('delete', 'Vacancy')">
+                <td class="text-center" style="width: 80px">
                   <Can I="delete" a="Vacancy">
                     <VIcon
                       size="30"

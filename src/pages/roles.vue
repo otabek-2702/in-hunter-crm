@@ -254,7 +254,6 @@ const deleteItem = async function (id) {
                 <td
                   class="text-center"
                   style="width: 80px"
-                  v-if="can('update', 'Role') || can('delete', 'Role')"
                 >
                   <div style="cursor: pointer">
                     <Can I="update" a="Role">
@@ -271,7 +270,7 @@ const deleteItem = async function (id) {
                         size="30"
                         icon="bx-trash"
                         style="color: red"
-                        @click="confirmDelete(role.id, role.name_uz)"
+                        @click="confirmDelete(role.id, role.name_ru)"
                       ></VIcon>
                     </Can>
                   </div>

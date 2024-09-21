@@ -276,7 +276,6 @@ const handleCandidateOpen = (id) => {
                 <td
                   class="text-center"
                   :style="{ width: '80px', zIndex: '10' }"
-                  v-if="can('update', 'Role') || can('change', 'Candidatestate')"
                 >
                   <Can I="update" a="Role">
                     <VIcon
