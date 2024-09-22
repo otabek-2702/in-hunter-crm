@@ -169,10 +169,8 @@ const openEditDrawer = (id) => {
 const candidateViewId = ref(0);
 
 const handleCandidateOpen = (id) => {
-  if(can('show', 'Candidate')) {
-    candidateViewId.value = id;
-    isCandidateInfoDialogVisible.value = true;
-  }
+  candidateViewId.value = id;
+  isCandidateInfoDialogVisible.value = true;
 };
 </script>
 
@@ -241,7 +239,12 @@ const handleCandidateOpen = (id) => {
                 <th
                   v-if="
                     (can('update', 'Role') || can('change', 'Candidatestate')) &&
-                    !candidates?.every((e) => e.state?.slug === 'success' || e.state?.slug === 'block' || e.state?.slug === 'cancel')
+                    !candidates?.every(
+                      (e) =>
+                        e.state?.slug === 'success' ||
+                        e.state?.slug === 'block' ||
+                        e.state?.slug === 'cancel',
+                    )
                   "
                 >
                   ДЕЙСТВИЯ
@@ -252,7 +255,7 @@ const handleCandidateOpen = (id) => {
             <tbody>
               <tr
                 @click="() => handleCandidateOpen(candidate.id)"
-                :style="{ cursor: can('show', 'Candidate') ? 'pointer' : 'auto' }"
+                :style="{ cursor: 'pointer' }"
                 v-for="candidate in candidates"
                 :key="candidate.id"
               >
@@ -273,10 +276,7 @@ const handleCandidateOpen = (id) => {
                     {{ candidate.state.name_ru }}
                   </VChip>
                 </td>
-                <td
-                  class="text-center"
-                  :style="{ width: '80px', zIndex: '10' }"
-                >
+                <td class="text-center" :style="{ width: '80px', zIndex: '10' }">
                   <Can I="update" a="Role">
                     <VIcon
                       @click="
