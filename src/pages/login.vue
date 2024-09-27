@@ -29,20 +29,16 @@ const password = ref()
 const error = ref(false)
 
 const login = () => {
-
-
   axios.post('/auth/login', {
     login: username.value,
     password: password.value,
   }).then(r => {
-
-    const { access_token,permissions,role,full_name } = r.data
+    const { access_token, permissions, role, full_name } = r.data
 
     const datas = {
       role: role,
       full_name: full_name
     }
-
 
     let userAbilities = permissions.map(item => {
       const [action, subject] = item.split('-');
@@ -52,20 +48,14 @@ const login = () => {
       };
     });
 
-
     localStorage.setItem('userAbilities', JSON.stringify(userAbilities))
     ability.update(userAbilities)
     localStorage.setItem('userData', JSON.stringify(datas))
-    // localStorage.setItem('accessToken', JSON.stringify(access_token))
     localStorage.setItem('accessToken', access_token)
 
-    // Redirect to `to` query if exist or redirect to index route
     router.replace(route.query.to ? String(route.query.to) : '/candidates')
   }).catch(e => {
-    // const { errors: formErrors } = e.response.data
-
     error.value = true
-
     console.error(e)
   })
 }
@@ -87,7 +77,7 @@ const onSubmit = () => {
       lg="8"
       class="d-none d-lg-flex"
     >
-      <!-- illustration -->
+      <!-- иллюстрация -->
       <div class="position-relative w-100 pa-8">
         <div class="d-flex align-center justify-center w-100 h-100">
           <VImg
@@ -111,8 +101,6 @@ const onSubmit = () => {
         class="mt-12 mt-sm-0 pa-6"
       >
 
-
-
         <VCardItem class="justify-start">
           <template #prepend>
             <div class="d-flex">
@@ -123,15 +111,9 @@ const onSubmit = () => {
           <VCardTitle class="auth-title">
             {{ themeConfig.app.title }}
           </VCardTitle>
-
-
         </VCardItem>
 
-
         <VCardText style="width: 400px">
-
-
-
           <VSnackbar
               v-model="error"
               location="top right"
@@ -139,21 +121,19 @@ const onSubmit = () => {
               transition="fade-transition"
               color="error"
           >
-            Login or Password do not match
-
+            Логин или пароль не совпадают
           </VSnackbar>
-
 
           <VForm
             ref="refVForm"
             @submit.prevent="onSubmit"
           >
             <VRow>
-              <!-- username -->
+              <!-- логин -->
               <VCol cols="12">
                 <VTextField
                   v-model="username"
-                  label="Login"
+                  label="Логин"
                   type="text"
                   autofocus
                   :rules="[requiredValidator]"
@@ -161,11 +141,11 @@ const onSubmit = () => {
                 />
               </VCol>
 
-              <!-- password -->
+              <!-- пароль -->
               <VCol cols="12">
                 <VTextField
                   v-model="password"
-                  label="Password"
+                  label="Пароль"
                   :rules="[requiredValidator]"
                   :type="isPasswordVisible ? 'text' : 'password'"
                   :error-messages="errors.password"
@@ -177,7 +157,7 @@ const onSubmit = () => {
                   type="submit"
                   class="mb-1 mt-3"
                 >
-                  Login
+                  Войти
                 </VBtn>
               </VCol>
             </VRow>
