@@ -266,7 +266,7 @@ const deleteItem = async function (id) {
 
             <tbody>
               <tr v-for="(job_position, i) in job_positions" :key="i">
-                <td>{{ i + 1 }}</td>
+                <td>{{ job_position.id }}</td>
                 <td>{{ job_position?.name_ru }}</td>
 
                 <td

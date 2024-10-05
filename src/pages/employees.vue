@@ -176,7 +176,7 @@ const deleteItem = async function (id) {
 
             <tbody>
               <tr v-for="(employee, i) in employees" :key="i">
-                <td>{{ i + 1 }}</td>
+                <td>{{ employee.id }}</td>
                 <td>{{ employee.name }}</td>
                 <td>{{ employee.login }}</td>
                 <td

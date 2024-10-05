@@ -2,6 +2,8 @@
 import avatar1 from '@images/avatars/avatar-1.png'
 import router from "@/router";
 import {ref} from "vue";
+import axios from '@/plugins/axios';
+import ability from '@/plugins/casl/ability';
 
 function logOut(){
   localStorage.removeItem('accessToken')
@@ -11,6 +13,35 @@ function logOut(){
   router.push('/login')
 
 }
+
+const reLogIn = async () => {
+  axios
+    .post('/auth/me')
+    .then((r) => {
+      const { access_token, permissions, role, full_name } = r.data;
+
+      const datas = {
+        role: role,
+        full_name: full_name,
+      };
+
+      let userAbilities = permissions.map((item) => {
+        const [action, subject] = item.split('-');
+        return {
+          action: action,
+          subject: subject,
+        };
+      });
+
+      localStorage.setItem('userAbilities', JSON.stringify(userAbilities));
+      ability.update(userAbilities);
+      localStorage.setItem('userData', JSON.stringify(datas));
+      localStorage.setItem('accessToken', access_token);
+    })
+    .catch((e) => {
+      console.error(e);
+    });
+};
 
 const full_name = ref(JSON.parse(localStorage.getItem('userData')).full_name)
 const role = ref(JSON.parse(localStorage.getItem('userData')).role.name_ru)
@@ -68,8 +99,13 @@ const role = ref(JSON.parse(localStorage.getItem('userData')).role.name_ru)
           </VListItem>
 
           <VDivider class="my-2" />
+          <VListItem @click="reLogIn">
+            <template #prepend>
+              <VIcon class="me-2" icon="mdi-reload" size="22" />
+            </template>
 
-
+            <VListItemTitle>Обновить</VListItemTitle>
+          </VListItem>
 
           <!-- Divider -->
           <VDivider class="my-2" />
