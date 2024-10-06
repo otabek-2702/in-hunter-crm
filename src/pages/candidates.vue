@@ -217,7 +217,7 @@ const handleCandidateOpen = (id) => {
                 density="compact"
                 class="me-6"
               />
-              <Can I="add" a="Role">
+              <Can I="add" a="Candidate">
                 <VBtn @click="isAddNewCandidateDrawerVisible = true"> Добавить кандидата </VBtn>
               </Can>
             </VCol>
