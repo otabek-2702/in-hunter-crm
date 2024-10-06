@@ -169,6 +169,7 @@ const deleteItem = async function (id) {
               <tr>
                 <th style="width: 48px">ID</th>
                 <th>ФИО</th>
+                <th>Роль</th>
                 <th>Логин</th>
                 <th v-if="can('update', 'User') || can('delete', 'User')">Действия</th>
               </tr>
@@ -178,6 +179,7 @@ const deleteItem = async function (id) {
               <tr v-for="(employee, i) in employees" :key="i">
                 <td>{{ employee.id }}</td>
                 <td>{{ employee.name }}</td>
+                <td>{{ employee.role?.name_ru }}</td>
                 <td>{{ employee.login }}</td>
                 <td
                   class="text-center"
