@@ -63,6 +63,10 @@ const candidatePhoto = computed(() => {
   return AccountImg;
 });
 
+const candidateAudio = computed(() => {
+  return `${import.meta.env.VITE_BASE_URL}${itemData.value.voice}`;
+});
+
 const fetchLanguages = async function () {
   try {
     const response = await axios.get('/languages');
@@ -260,7 +264,7 @@ const resolveUserRoleVariant = (state) => {
             <VCol cols="9">
               <VListItem>
                 <VListItemTitle>
-                  <span style="font-weight: 700; margin-inline-end: 4px">Полное имя: </span>
+                  <span>Полное имя: </span>
                   <span
                     :style="{
                       fontSize: '1rem',
@@ -277,13 +281,13 @@ const resolveUserRoleVariant = (state) => {
 
               <VListItem>
                 <VListItemTitle>
-                  <span style="font-weight: 700; margin-inline-end: 4px">Возраст: </span>
+                  <span>Возраст: </span>
                   <span
                     :style="{
                       fontSize: '1rem',
                       fontWeight: '400',
                       lineHeight: '1.5rem',
-                      letterSpacing: '0.0094rem',
+                      letterSpacing: '0.1rem',
                       textTransform: 'none',
                       whiteSpace: 'wrap',
                     }"
@@ -294,7 +298,7 @@ const resolveUserRoleVariant = (state) => {
 
               <VListItem>
                 <VListItemTitle>
-                  <span style="font-weight: 700; margin-inline-end: 4px">Ден рождения: </span>
+                  <span>Ден рождения: </span>
                   <span
                     :style="{
                       fontSize: '1rem',
@@ -311,7 +315,7 @@ const resolveUserRoleVariant = (state) => {
 
               <VListItem>
                 <VListItemTitle>
-                  <span style="font-weight: 700; margin-inline-end: 4px">Пол: </span>
+                  <span>Пол: </span>
                   <span
                     :style="{
                       fontSize: '1rem',
@@ -334,86 +338,37 @@ const resolveUserRoleVariant = (state) => {
               <VRow>
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px"
-                      >Позитивные навыки:
-                    </span>
-                    <span
-                      :style="{
-                        fontSize: '1rem',
-                        fontWeight: '400',
-                        lineHeight: '1.5rem',
-                        letterSpacing: '0.0094rem',
-                        textTransform: 'none',
-                        whiteSpace: 'wrap',
-                      }"
-                      >{{ itemData.positive_skills }}</span
-                    >
+                    <span>Позитивные навыки: </span>
+                    <span>{{ itemData.positive_skills }}</span>
                   </VListItemTitle>
                 </VListItem>
 
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Платформы: </span>
-                    <span
-                      :style="{
-                        fontSize: '1rem',
-                        fontWeight: '400',
-                        lineHeight: '1.5rem',
-                        letterSpacing: '0.0094rem',
-                        textTransform: 'none',
-                        whiteSpace: 'wrap',
-                      }"
-                      >{{ itemData.apps_text }}</span
-                    >
+                    <span>Платформы: </span>
+                    <span>{{ itemData.apps_text }}</span>
                   </VListItemTitle>
                 </VListItem>
 
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Программы: </span>
-                    <span
-                      :style="{
-                        fontSize: '1rem',
-                        fontWeight: '400',
-                        lineHeight: '1.5rem',
-                        letterSpacing: '0.0094rem',
-                        textTransform: 'none',
-                        whiteSpace: 'wrap',
-                      }"
-                      >{{ itemData.apps }}</span
-                    >
+                    <span>Программы: </span>
+                    <span>{{ itemData.apps }}</span>
                   </VListItemTitle>
                 </VListItem>
 
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Номер телефона: </span>
-                    <span
-                      :style="{
-                        fontSize: '1rem',
-                        fontWeight: '400',
-                        lineHeight: '1.5rem',
-                        letterSpacing: '0.0094rem',
-                        textTransform: 'none',
-                        whiteSpace: 'wrap',
-                      }"
-                      >{{ itemData.phone_number }}</span
-                    >
+                    <span>Номер телефона: </span>
+                    <span>{{ itemData.phone_number }}</span>
                   </VListItemTitle>
                 </VListItem>
 
                 <!-- <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Языки: </span>
+                    <span>Языки: </span>
                     <span
-                      :style="{
-                        fontSize: '1rem',
-                        fontWeight: '400',
-                        lineHeight: '1.5rem',
-                        letterSpacing: '0.0094rem',
-                        textTransform: 'none',
-                        whiteSpace: 'wrap',
-                      }"
+                      
                       >{{ languages_label }}</span
                     >
                   </VListItemTitle>
@@ -421,16 +376,9 @@ const resolveUserRoleVariant = (state) => {
 
                  <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Add source: </span>
+                    <span>Add source: </span>
                     <span
-                      :style="{
-                        fontSize: '1rem',
-                        fontWeight: '400',
-                        lineHeight: '1.5rem',
-                        letterSpacing: '0.0094rem',
-                        textTransform: 'none',
-                        whiteSpace: 'wrap',
-                      }"
+                      
                       >{{ itemData.add_source }}</span
                     >
                   </VListItemTitle>
@@ -438,16 +386,9 @@ const resolveUserRoleVariant = (state) => {
 
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Last works: </span>
+                    <span>Last works: </span>
                     <span
-                      :style="{
-                        fontSize: '1rem',
-                        fontWeight: '400',
-                        lineHeight: '1.5rem',
-                        letterSpacing: '0.0094rem',
-                        textTransform: 'none',
-                        whiteSpace: 'wrap',
-                      }"
+                      
                       >{{ itemData.last_work }}</span
                     >
                   </VListItemTitle>
@@ -455,16 +396,9 @@ const resolveUserRoleVariant = (state) => {
 
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Marital state: </span>
+                    <span>Marital state: </span>
                     <span
-                      :style="{
-                        fontSize: '1rem',
-                        fontWeight: '400',
-                        lineHeight: '1.5rem',
-                        letterSpacing: '0.0094rem',
-                        textTransform: 'none',
-                        whiteSpace: 'wrap',
-                      }"
+                      
                       >{{ itemData.marital_state }}</span
                     >
                   </VListItemTitle>
@@ -472,16 +406,9 @@ const resolveUserRoleVariant = (state) => {
 
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">University: </span>
+                    <span>University: </span>
                     <span
-                      :style="{
-                        fontSize: '1rem',
-                        fontWeight: '400',
-                        lineHeight: '1.5rem',
-                        letterSpacing: '0.0094rem',
-                        textTransform: 'none',
-                        whiteSpace: 'wrap',
-                      }"
+                      
                       >{{ itemData.university_place }}</span
                     >
                   </VListItemTitle>
@@ -492,92 +419,42 @@ const resolveUserRoleVariant = (state) => {
               <VRow>
                 <VListItem>
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Языки: </span>
-                    <span
-                      :style="{
-                        fontSize: '1rem',
-                        fontWeight: '400',
-                        lineHeight: '1.5rem',
-                        letterSpacing: '0.0094rem',
-                        textTransform: 'none',
-                        whiteSpace: 'wrap',
-                      }"
-                      >{{ languages_label }}</span
-                    >
+                    <span>Языки: </span>
+                    <span>{{ languages_label }}</span>
                   </VListItemTitle>
                 </VListItem>
                 <VListItem v-if="itemData.add_source">
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Add source: </span>
-                    <span
-                      :style="{
-                        fontSize: '1rem',
-                        fontWeight: '400',
-                        lineHeight: '1.5rem',
-                        letterSpacing: '0.0094rem',
-                        textTransform: 'none',
-                        whiteSpace: 'wrap',
-                      }"
-                      >{{ itemData.add_source }}</span
-                    >
+                    <span>Add source: </span>
+                    <span>{{ itemData.add_source }}</span>
                   </VListItemTitle>
                 </VListItem>
 
                 <VListItem v-if="itemData.last_work">
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Last works: </span>
-                    <span
-                      :style="{
-                        fontSize: '1rem',
-                        fontWeight: '400',
-                        lineHeight: '1.5rem',
-                        letterSpacing: '0.0094rem',
-                        textTransform: 'none',
-                        whiteSpace: 'wrap',
-                      }"
-                      >{{ itemData.last_work }}</span
-                    >
+                    <span>Last works: </span>
+                    <span>{{ itemData.last_work }}</span>
                   </VListItemTitle>
                 </VListItem>
 
                 <VListItem v-if="itemData.marital_state">
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">Marital state: </span>
-                    <span
-                      :style="{
-                        fontSize: '1rem',
-                        fontWeight: '400',
-                        lineHeight: '1.5rem',
-                        letterSpacing: '0.0094rem',
-                        textTransform: 'none',
-                        whiteSpace: 'wrap',
-                      }"
-                      >{{ itemData.marital_state }}</span
-                    >
+                    <span>Marital state: </span>
+                    <span>{{ itemData.marital_state }}</span>
                   </VListItemTitle>
                 </VListItem>
 
                 <VListItem v-if="itemData.university_place">
                   <VListItemTitle>
-                    <span style="font-weight: 700; margin-inline-end: 4px">University: </span>
-                    <span
-                      :style="{
-                        fontSize: '1rem',
-                        fontWeight: '400',
-                        lineHeight: '1.5rem',
-                        letterSpacing: '0.0094rem',
-                        textTransform: 'none',
-                        whiteSpace: 'wrap',
-                      }"
-                      >{{ itemData.university_place }}</span
-                    >
+                    <span>University: </span>
+                    <span>{{ itemData.university_place }}</span>
                   </VListItemTitle>
                 </VListItem>
               </VRow>
             </VCol>
 
             <VCol cols="12">
-              <audio controls :src="`${import.meta.env.VITE_BASE_URL}${itemData.voice}`"></audio>
+              <audio controls :src="candidateAudio"></audio>
               <!-- 👉 Activity timeline -->
               <VCard title="User Activity Timeline">
                 <VCardText>
@@ -626,3 +503,18 @@ const resolveUserRoleVariant = (state) => {
     </VCard>
   </VDialog>
 </template>
+
+<style scoped>
+span:first-child {
+  font-weight: 700;
+  margin-inline-end: 4px;
+}
+span:last-child {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+  letter-spacing: 0.01rem;
+  text-transform: none;
+  white-space: wrap;
+}
+</style>
