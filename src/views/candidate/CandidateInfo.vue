@@ -577,7 +577,7 @@ const resolveUserRoleVariant = (state) => {
             </VCol>
 
             <VCol cols="12">
-              <audio controls :src="`https://api.inhunter.jasondev.uz/${itemData.voice}`"></audio>
+              <audio controls :src="`${import.meta.env.VITE_BASE_URL}${itemData.voice}`"></audio>
               <!-- 👉 Activity timeline -->
               <VCard title="User Activity Timeline">
                 <VCardText>
