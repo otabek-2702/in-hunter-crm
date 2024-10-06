@@ -58,7 +58,7 @@ const fetchData = async () => {
 
 const candidatePhoto = computed(() => {
   if (itemData.value.photo) {
-    return `https://api.inhunter.jasondev.uz/${itemData.value.photo}`;
+    return `${import.meta.env.VITE_BASE_URL}${itemData.value.photo}`;
   }
   return AccountImg;
 });
@@ -191,11 +191,23 @@ const timelineDotcolor = (id) => {
 
 const timelineDate = (data) => {
   const dateTime = new Date(data);
-  const date = (dateTime.getDate() + 1).toString().length < 2 ? `0${(dateTime.getDate() + 1)}` : (dateTime.getDate() + 1);
-  const month = (dateTime.getMonth() + 1).toString().length < 2 ? `0${(dateTime.getMonth() + 1)}` : (dateTime.getMonth() + 1);
+  const date =
+    (dateTime.getDate() + 1).toString().length < 2
+      ? `0${dateTime.getDate() + 1}`
+      : dateTime.getDate() + 1;
+  const month =
+    (dateTime.getMonth() + 1).toString().length < 2
+      ? `0${dateTime.getMonth() + 1}`
+      : dateTime.getMonth() + 1;
   const year = dateTime.getFullYear();
-  const hour = (dateTime.getHours() + 1).toString().length < 2 ? `0${(dateTime.getHours() + 1)}` : (dateTime.getHours() + 1);
-  const minute = (dateTime.getMinutes() + 1).toString().length < 2 ? `0${(dateTime.getMinutes() + 1)}` : (dateTime.getMinutes() + 1);
+  const hour =
+    (dateTime.getHours() + 1).toString().length < 2
+      ? `0${dateTime.getHours() + 1}`
+      : dateTime.getHours() + 1;
+  const minute =
+    (dateTime.getMinutes() + 1).toString().length < 2
+      ? `0${dateTime.getMinutes() + 1}`
+      : dateTime.getMinutes() + 1;
   return `${date}-${month}-${year} ${hour}:${minute}`;
 };
 
