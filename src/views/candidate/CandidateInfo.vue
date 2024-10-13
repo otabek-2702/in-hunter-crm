@@ -298,7 +298,7 @@ const resolveUserRoleVariant = (state) => {
 
               <VListItem>
                 <VListItemTitle>
-                  <span>Ден рождения: </span>
+                  <span>День рождения: </span>
                   <span
                     :style="{
                       fontSize: '1rem',
@@ -325,7 +325,7 @@ const resolveUserRoleVariant = (state) => {
                       textTransform: 'none',
                       whiteSpace: 'wrap',
                     }"
-                    >{{ itemData.gender === 'man' ? 'Мужчина' : 'Женщина' }}</span
+                    >{{ itemData.gender }}</span
                   >
                 </VListItemTitle>
               </VListItem>
