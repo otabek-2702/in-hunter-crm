@@ -278,10 +278,15 @@ const createCandidatePdf = async () => {
       <VCardText v-if="!isFetchingStart">
         <VRow>
           <VRow id="candidate-data">
-            <!-- Candidate Image -->
+            <!-- Candidate Image 
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+            -->
             <VCol cols="3">
-              <img
+              <!-- 
                 :src="candidatePhoto"
+                -->
+                <img
+                :src="'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMK0UriHrpBR3-llABzzrdbWucp0T8hMim64DmvQlV2Yf7BaiT'"
                 alt="аватар"
                 :style="{ width: '100%', borderRadius: '5px' }"
               />
