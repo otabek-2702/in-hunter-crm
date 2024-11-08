@@ -1,9 +1,10 @@
 <script setup>
-import axios from '@axios';
-import { computed } from 'vue';
-import { toast } from 'vue3-toastify';
-import AccountImg from '@/assets/images/candidates/account.png';
-import { requiredValidator } from '@validators';
+import axios from "@axios";
+import { computed, nextTick } from "vue";
+import { toast } from "vue3-toastify";
+import AccountImg from "@/assets/images/candidates/account.png";
+import html2pdf from "html-to-pdf-js";
+import { transformPhoneNumber } from "@/helpers";
 
 const props = defineProps({
   candidateId: {
@@ -15,7 +16,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:isDrawerOpen']);
+const emit = defineEmits(["update:isDrawerOpen"]);
 
 const refForm = ref();
 const isFetching = ref(false);
@@ -29,7 +30,7 @@ const photo = ref();
 const languages = ref([]);
 
 const onFormCancel = () => {
-  emit('update:isDrawerOpen', false);
+  emit("update:isDrawerOpen", false);
   nextTick(() => {
     setTimeout(() => {
       refForm.value?.reset();
@@ -41,16 +42,16 @@ const fetchData = async () => {
   try {
     isFetchingStart.value = true;
 
-    let candidate = await axios.get('/candidates/' + props.candidateId);
+    let candidate = await axios.get("/candidates/" + props.candidateId);
 
     itemData.value = await candidate.data;
 
     languages.value = candidate.data.languages
-      .split(',') // Разбиваем строку по запятой
+      .split(",") // Разбиваем строку по запятой
       .filter(Boolean)
       .map(Number);
   } catch (error) {
-    console.log('Ошибка', error);
+    console.log("Ошибка", error);
   } finally {
     isFetchingStart.value = false;
   }
@@ -69,10 +70,10 @@ const candidateAudio = computed(() => {
 
 const fetchLanguages = async function () {
   try {
-    const response = await axios.get('/languages');
+    const response = await axios.get("/languages");
     languages_list.value = response.data;
   } catch (error) {
-    console.error('Ошибка :', error);
+    console.error("Ошибка :", error);
   }
 };
 
@@ -83,7 +84,7 @@ watch(
       fetchData();
       fetchLanguages();
     }
-  },
+  }
 );
 
 // // Format the birthday input
@@ -167,61 +168,89 @@ watch(
 const languages_label = computed(() => {
   const newArr = [];
   if (languages && languages_list) {
-    languages.value?.map((n) => newArr.push(languages_list.value[n - 1]?.name_ru));
+    languages.value?.map((n) =>
+      newArr.push(languages_list.value[n - 1]?.name_ru)
+    );
 
-    return newArr?.join(', ');
+    return newArr?.join(", ");
   }
-  return '';
+  return "";
 });
 
 const timelineDotcolor = (id) => {
   switch (id) {
     case 1:
-      return 'primary';
+      return "primary";
     case 2:
-      return 'info';
+      return "info";
     case 3:
-      return '';
+      return "";
     case 4:
-      return 'danger';
+      return "danger";
     case 5:
-      return 'danger';
+      return "danger";
     case 6:
-      return 'success';
+      return "success";
     default:
-      return '';
+      return "";
   }
 };
 
 const timelineDate = (data) => {
   const dateTime = new Date(data);
-  
+
   // Helper function to format with leading zeros
-  const padZero = (num) => String(num).padStart(2, '0');
-  
+  const padZero = (num) => String(num).padStart(2, "0");
+
   // Format date and time components
   const date = padZero(dateTime.getDate());
   const month = padZero(dateTime.getMonth() + 1); // Months are 0-indexed
   const year = dateTime.getFullYear();
   const hour = padZero(dateTime.getHours());
   const minute = padZero(dateTime.getMinutes());
-  
+
   return `${date}-${month}-${year} ${hour}:${minute}`;
 };
 
-
-const resolveUserRoleVariant = (state) => {
-  const roleMap = {
-    new: { color: 'primary' },
-    cancel: { color: 'warning' },
-    archive: { color: 'secondary' },
-    success: { color: 'success' },
-    invite: { color: 'info' },
-    block: { color: 'error' },
-  };
-
-  return roleMap[state] || { color: 'primary' };
+const createCandidatePdf = async () => {
+  try {
+    const candidateDataElement = document.getElementById("candidate-data");
+    if (candidateDataElement) {
+      isFetchingStart.value = true;
+      // all text to black (because of theme bug in black theme, black theme text color does not supported by pdf)
+      candidateDataElement.querySelectorAll("span, p, h4, h6").forEach((el) => {
+        el.style.color = "#000";
+      });
+      // Creating a pdf
+      await html2pdf(candidateDataElement, {
+        margin: 1,
+        filename: `${itemData.value.full_name}.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+        },
+        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+      });
+      // reset all text
+      candidateDataElement.querySelectorAll("span, p, h4, h6").forEach((el) => {
+        el.style.color =
+          "rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity)) !important";
+      });
+    } else {
+      console.error("Element '#candidate-data' not found.");
+    }
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    toast.error("Ошибка при создании PDF. Пожалуйста, попробуйте позже.");
+  } finally {
+    setTimeout(() => {
+      isFetchingStart.value = false;
+    }, 200);
+  }
 };
+
 </script>
 
 <template>
@@ -239,14 +268,16 @@ const resolveUserRoleVariant = (state) => {
       </VCardItem>
 
       <!-- Loader -->
-      <div v-if="isFetchingStart" class="d-flex h-screen align-center justify-center">
+      <div
+        v-if="isFetchingStart"
+        class="d-flex h-screen align-center justify-center"
+      >
         <VProgressCircular color="primary" indeterminate></VProgressCircular>
       </div>
 
       <VCardText v-if="!isFetchingStart">
-        <!-- Form -->
-        <VForm ref="refForm" @submit.prevent="onFormSubmit" :disabled="isFetching">
-          <VRow>
+        <VRow>
+          <VRow id="candidate-data">
             <!-- Candidate Image -->
             <VCol cols="3">
               <img
@@ -260,75 +291,33 @@ const resolveUserRoleVariant = (state) => {
               <VListItem>
                 <VListItemTitle>
                   <span>Полное имя: </span>
-                  <span
-                    :style="{
-                      fontSize: '1rem',
-                      fontWeight: '400',
-                      lineHeight: '1.5rem',
-                      letterSpacing: '0.0094rem',
-                      textTransform: 'none',
-                      whiteSpace: 'wrap',
-                    }"
-                    >{{ itemData.full_name }}</span
-                  >
+                  <span>{{ itemData.full_name }}</span>
                 </VListItemTitle>
               </VListItem>
 
               <VListItem>
                 <VListItemTitle>
                   <span>Возраст: </span>
-                  <span
-                    :style="{
-                      fontSize: '1rem',
-                      fontWeight: '400',
-                      lineHeight: '1.5rem',
-                      letterSpacing: '0.1rem',
-                      textTransform: 'none',
-                      whiteSpace: 'wrap',
-                    }"
-                    >{{ itemData.age }}</span
-                  >
+                  <span>{{ itemData.age }}</span>
                 </VListItemTitle>
               </VListItem>
 
               <VListItem>
                 <VListItemTitle>
                   <span>День рождения: </span>
-                  <span
-                    :style="{
-                      fontSize: '1rem',
-                      fontWeight: '400',
-                      lineHeight: '1.5rem',
-                      letterSpacing: '0.0094rem',
-                      textTransform: 'none',
-                      whiteSpace: 'wrap',
-                    }"
-                    >{{ itemData.birthday }}</span
-                  >
+                  <span>{{ itemData.birthday }}</span>
                 </VListItemTitle>
               </VListItem>
 
               <VListItem>
                 <VListItemTitle>
                   <span>Пол: </span>
-                  <span
-                    :style="{
-                      fontSize: '1rem',
-                      fontWeight: '400',
-                      lineHeight: '1.5rem',
-                      letterSpacing: '0.0094rem',
-                      textTransform: 'none',
-                      whiteSpace: 'wrap',
-                    }"
-                    >{{ itemData.gender }}</span
-                  >
+                  <span>{{ itemData.gender }}</span>
                 </VListItemTitle>
               </VListItem>
             </VCol>
-          </VRow>
 
-          <!-- Candidate Details -->
-          <VRow>
+            <!-- Candidate Details -->
             <VCol cols="6">
               <VRow>
                 <VListItem>
@@ -355,7 +344,9 @@ const resolveUserRoleVariant = (state) => {
                 <VListItem>
                   <VListItemTitle>
                     <span>Номер телефона: </span>
-                    <span>{{ itemData.phone_number }}</span>
+                    <span>{{
+                      transformPhoneNumber(itemData.phone_number)
+                    }}</span>
                   </VListItemTitle>
                 </VListItem>
 
@@ -420,80 +411,98 @@ const resolveUserRoleVariant = (state) => {
                 </VListItem>
                 <VListItem v-if="itemData.add_source">
                   <VListItemTitle>
-                    <span>Add source: </span>
+                    <span>Источник добавления: </span>
                     <span>{{ itemData.add_source }}</span>
                   </VListItemTitle>
                 </VListItem>
 
                 <VListItem v-if="itemData.last_work">
                   <VListItemTitle>
-                    <span>Last works: </span>
+                    <span>Последние работы: </span>
                     <span>{{ itemData.last_work }}</span>
                   </VListItemTitle>
                 </VListItem>
 
                 <VListItem v-if="itemData.marital_state">
                   <VListItemTitle>
-                    <span>Marital state: </span>
+                    <span>Семейное положение: </span>
                     <span>{{ itemData.marital_state }}</span>
                   </VListItemTitle>
                 </VListItem>
 
                 <VListItem v-if="itemData.university_place">
                   <VListItemTitle>
-                    <span>University: </span>
+                    <span>Университет: </span>
                     <span>{{ itemData.university_place }}</span>
                   </VListItemTitle>
                 </VListItem>
               </VRow>
             </VCol>
-
-            <VCol cols="12">
-              <audio controls :src="candidateAudio"></audio>
-              <!-- 👉 Activity timeline -->
-              <VCard title="User Activity Timeline">
-                <VCardText>
-                  <VTimeline
-                    density="compact"
-                    align="start"
-                    truncate-line="start"
-                    class="v-timeline-density-compact"
-                    line-inset="12"
-                  >
-                    <VTimelineItem
-                      v-for="action in itemData.actions"
-                      :dot-color="timelineDotcolor(action.state.id)"
-                      size="x-small"
-                    >
-                      <div class="d-flex justify-space-between align-center flex-wrap">
-                        <h4 class="text-base font-weight-semibold me-1 mb-3">
-                          #{{ action.id }}
-                          <VChip
-                            :color="resolveUserRoleVariant(action.state.slug).color"
-                            density="compact"
-                            label
-                            class="text-uppercase"
-                          >
-                            {{ action.state.name_ru }}
-                          </VChip>
-                        </h4>
-                        <span class="text-sm text-disabled text-no-wrap">{{
-                          timelineDate(action.created_at)
-                        }}</span>
-                      </div>
-                      <p class="mb-2">{{ action.user.name }} {{ action.name_ru }}</p>
-                      <div class="mt-2">
-                        <h6 class="font-weight-semibold text-sm">
-                          Коментария: {{ action.comment.message }}
-                        </h6>
-                      </div>
-                    </VTimelineItem>
-                  </VTimeline>
-                </VCardText>
-              </VCard>
-            </VCol>
           </VRow>
-        </VForm>
+
+          <VCol cols="12">
+            <VRow>
+              <VCol cols="6" class="ps-0 pt-4">
+                <audio controls :src="candidateAudio"></audio>
+              </VCol>
+              <VCol cols="6" class="d-flex justify-end align-center">
+                <VBtn @click="createCandidatePdf" density="default">
+                  <span class="text-bold pe-1"> Скачать </span>
+                  <VIcon icon="mdi-file-download" size="24" />
+                </VBtn>
+              </VCol>
+            </VRow>
+
+            <!-- 👉 Activity timeline -->
+            <VCard
+              title="История обновлений статусов"
+              v-if="itemData?.actions?.length"
+            >
+              <VCardText>
+                <VTimeline
+                  density="compact"
+                  align="start"
+                  truncate-line="start"
+                  class="v-timeline-density-compact"
+                  line-inset="12"
+                >
+                  <VTimelineItem
+                    v-for="action in itemData.actions"
+                    :dot-color="timelineDotcolor(action.state.id)"
+                    size="x-small"
+                  >
+                    <div
+                      class="d-flex justify-space-between align-center flex-wrap"
+                    >
+                      <h4 class="text-base font-weight-semibold me-1 mb-3">
+                        #{{ action.id }}
+                        <VChip
+                          :color="timelineDotcolor(action.state.id)"
+                          density="compact"
+                          label
+                          class="text-uppercase ms-2"
+                        >
+                          {{ action.state.name_ru }}
+                        </VChip>
+                      </h4>
+                      <span class="text-sm text-disabled text-no-wrap">{{
+                        timelineDate(action.created_at)
+                      }}</span>
+                    </div>
+                    <p class="mb-2">
+                      {{ action.user.name }} {{ action.name_ru }}
+                    </p>
+                    <div class="mt-2">
+                      <h6 class="font-weight-semibold text-sm">
+                        Коментария: {{ action.comment.message }}
+                      </h6>
+                    </div>
+                  </VTimelineItem>
+                </VTimeline>
+              </VCardText>
+            </VCard>
+          </VCol>
+        </VRow>
       </VCardText>
     </VCard>
   </VDialog>

@@ -8,6 +8,7 @@ import Skeleton from '@/views/skeleton/Skeleton.vue';
 import CandidateInfo from '@/views/candidate/CandidateInfo.vue';
 import CandidateAccept from '@/views/candidate/CandidateAccept.vue';
 import { useAppAbility } from '@/plugins/casl/useAppAbility';
+import { transformPhoneNumber } from '@/helpers';
 
 const { can } = useAppAbility();
 const searchQuery = ref('');
@@ -265,7 +266,7 @@ const handleCandidateOpen = (id) => {
                 </td>
                 <td>{{ candidate.age }}</td>
                 <td>{{ candidate.address }}</td>
-                <td>{{ candidate.phone_number }}</td>
+                <td>{{ transformPhoneNumber(candidate.phone_number) }}</td>
                 <td>
                   <VChip
                     :color="resolveUserRoleVariant(candidate.state.slug).color"
@@ -323,7 +324,7 @@ const handleCandidateOpen = (id) => {
                 </td>
               </tr>
             </tbody>
-            <Skeleton :count="7" v-show="isFetching && !candidates.length" />
+            <Skeleton :count="6" v-show="isFetching && !candidates.length" />
 
             <tfoot v-show="!isFetching && !candidates.length">
               <tr>
