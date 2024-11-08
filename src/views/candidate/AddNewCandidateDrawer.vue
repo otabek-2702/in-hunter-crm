@@ -153,11 +153,11 @@ watchEffect(fetchLanguages);
               </VCol>
 
               <VCol cols="12">
-                <VTextField v-model="apps_text" :rules="[requiredValidator]" label="Текст приложений" />
+                <VTextField v-model="apps_text" :rules="[requiredValidator]" label="Приложения" />
               </VCol>
 
               <VCol cols="12">
-                <VTextField v-model="apps" :rules="[requiredValidator]" label="Приложения" />
+                <VTextField v-model="apps" :rules="[requiredValidator]" label="Платформы" />
               </VCol>
 
               <VCol cols="12">

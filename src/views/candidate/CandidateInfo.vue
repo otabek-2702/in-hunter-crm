@@ -195,25 +195,20 @@ const timelineDotcolor = (id) => {
 
 const timelineDate = (data) => {
   const dateTime = new Date(data);
-  const date =
-    (dateTime.getDate() + 1).toString().length < 2
-      ? `0${dateTime.getDate() + 1}`
-      : dateTime.getDate() + 1;
-  const month =
-    (dateTime.getMonth() + 1).toString().length < 2
-      ? `0${dateTime.getMonth() + 1}`
-      : dateTime.getMonth() + 1;
+  
+  // Helper function to format with leading zeros
+  const padZero = (num) => String(num).padStart(2, '0');
+  
+  // Format date and time components
+  const date = padZero(dateTime.getDate());
+  const month = padZero(dateTime.getMonth() + 1); // Months are 0-indexed
   const year = dateTime.getFullYear();
-  const hour =
-    (dateTime.getHours() + 1).toString().length < 2
-      ? `0${dateTime.getHours() + 1}`
-      : dateTime.getHours() + 1;
-  const minute =
-    (dateTime.getMinutes() + 1).toString().length < 2
-      ? `0${dateTime.getMinutes() + 1}`
-      : dateTime.getMinutes() + 1;
+  const hour = padZero(dateTime.getHours());
+  const minute = padZero(dateTime.getMinutes());
+  
   return `${date}-${month}-${year} ${hour}:${minute}`;
 };
+
 
 const resolveUserRoleVariant = (state) => {
   const roleMap = {
@@ -345,14 +340,14 @@ const resolveUserRoleVariant = (state) => {
 
                 <VListItem>
                   <VListItemTitle>
-                    <span>Платформы: </span>
+                    <span>Приложения: </span>
                     <span>{{ itemData.apps_text }}</span>
                   </VListItemTitle>
                 </VListItem>
 
                 <VListItem>
                   <VListItemTitle>
-                    <span>Программы: </span>
+                    <span>Платформы: </span>
                     <span>{{ itemData.apps }}</span>
                   </VListItemTitle>
                 </VListItem>
