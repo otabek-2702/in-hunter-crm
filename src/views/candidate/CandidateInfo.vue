@@ -212,35 +212,40 @@ const timelineDate = (data) => {
   return `${date}-${month}-${year} ${hour}:${minute}`;
 };
 
-const createCandidatePdf = async () => {
+const createCandidatePdf = async (photo_url) => {
   try {
     const candidateDataElement = document.getElementById("candidate-data");
-    if (candidateDataElement) {
-      isFetchingStart.value = true;
-      // all text to black (because of theme bug in black theme, black theme text color does not supported by pdf)
-      candidateDataElement.querySelectorAll("span, p, h4, h6").forEach((el) => {
-        el.style.color = "#000";
-      });
-      // Creating a pdf
-      await html2pdf(candidateDataElement, {
-        margin: 1,
-        filename: `${itemData.value.full_name}.pdf`,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          allowTaint: true,
-        },
-        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-      });
-      // reset all text
-      candidateDataElement.querySelectorAll("span, p, h4, h6").forEach((el) => {
-        el.style.color =
-          "rgba(var(--v-theme-on-background), var(--v-medium-emphasis-opacity)) !important";
-      });
-    } else {
-      console.error("Element '#candidate-data' not found.");
+    if (!candidateDataElement) {
+      throw new Error("Element '#candidate-data' not found.");
     }
+
+    isFetchingStart.value = true;
+
+    // Clone the element to avoid modifying the original
+    const clonedElement = candidateDataElement.cloneNode(true);
+
+    // Set text color to black
+    clonedElement.querySelectorAll("span, p, h4, h6").forEach((el) => {
+      el.style.color = "#000";
+    });
+
+    // Generate PDF
+    const options = {
+      margin: 1,
+      filename: `${itemData.value.full_name}.pdf`,
+      image: {
+        type: "jpeg",
+        quality: 0.98,
+      },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+      },
+      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+    };
+
+    html2pdf().set(options).from(clonedElement).save();
   } catch (error) {
     console.error("Error generating PDF:", error);
     toast.error("Ошибка при создании PDF. Пожалуйста, попробуйте позже.");
@@ -250,7 +255,6 @@ const createCandidatePdf = async () => {
     }, 200);
   }
 };
-
 </script>
 
 <template>
@@ -277,16 +281,11 @@ const createCandidatePdf = async () => {
 
       <VCardText v-if="!isFetchingStart">
         <VRow>
-          <VRow id="candidate-data">
-            <!-- Candidate Image 
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
-            -->
+          <VRow id="candidate-data" class="py-3">
+            <!-- Candidate Image -->
             <VCol cols="3">
-              <!-- 
+              <img
                 :src="candidatePhoto"
-                -->
-                <img
-                :src="'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMK0UriHrpBR3-llABzzrdbWucp0T8hMim64DmvQlV2Yf7BaiT'"
                 alt="аватар"
                 :style="{ width: '100%', borderRadius: '5px' }"
               />
@@ -451,7 +450,10 @@ const createCandidatePdf = async () => {
                 <audio controls :src="candidateAudio"></audio>
               </VCol>
               <VCol cols="6" class="d-flex justify-end align-center">
-                <VBtn @click="createCandidatePdf" density="default">
+                <VBtn
+                  @click="createCandidatePdf(itemData.photo)"
+                  density="default"
+                >
                   <span class="text-bold pe-1"> Скачать </span>
                   <VIcon icon="mdi-file-download" size="24" />
                 </VBtn>

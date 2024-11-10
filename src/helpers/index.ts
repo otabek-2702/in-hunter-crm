@@ -4,7 +4,6 @@ export const transformPhoneNumber = (phone) => {
     const uzbNumStart = /^998\d{9}$/;
     const uzbNumStartWithPlus = /^\+998\d{9}$/;
   
-    console.log(cleanedPhone);
     if (cleanedPhone.length === 9) {
       return (
         "+998" +
@@ -24,7 +23,6 @@ export const transformPhoneNumber = (phone) => {
     ) {
       return cleanedPhone.replace(/(\+998)(\d{2})(\d{3})(\d{2})(\d{2})/, "$1 $2 $3 $4 $5");
     }
-    console.log(uzbNumStartWithPlus.test(cleanedPhone), cleanedPhone.length);
     // If no specific format is needed, return the cleaned phone number
     return cleanedPhone;
   };

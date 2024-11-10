@@ -64,7 +64,6 @@ const handleDrawerModelValueUpdate = (val) => {
 const fetchPermissions = async function () {
   const r = await axios.get('/permissions/all');
   permissions.value = r.data['permissions'];
-  console.log(permissions.value);
 };
 
 watchEffect(fetchPermissions);

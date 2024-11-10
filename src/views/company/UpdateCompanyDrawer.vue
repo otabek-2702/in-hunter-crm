@@ -35,7 +35,6 @@ const closeNavigationDrawer = () => {
   });
 };
 const onSubmit = () => {
-  console.log(isFetching.value);
   refForm.value?.validate().then(async ({ valid }) => {
     if (valid) {
       isFetching.value = true;
