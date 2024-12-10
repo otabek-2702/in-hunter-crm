@@ -1,18 +1,18 @@
 <script setup>
-import { computed, onMounted, ref, watch, watchEffect } from 'vue';
-import axios from '@axios';
-import AddNewCandidateDrawer from '@/views/candidate/AddNewCandidateDrawer.vue';
-import UpdateCandidateDrawer from '@/views/candidate/UpdateCandidateDrawer.vue';
-import ChangeStateCandidate from '@/views/candidate/ChangeStateCandidate.vue';
-import Skeleton from '@/views/skeleton/Skeleton.vue';
-import CandidateInfo from '@/views/candidate/CandidateInfo.vue';
-import CandidateAccept from '@/views/candidate/CandidateAccept.vue';
-import { useAppAbility } from '@/plugins/casl/useAppAbility';
-import { transformPhoneNumber } from '@/helpers';
+import { computed, onMounted, ref, watch, watchEffect } from "vue";
+import axios from "@axios";
+import AddNewCandidateDrawer from "@/views/candidate/AddNewCandidateDrawer.vue";
+import UpdateCandidateDrawer from "@/views/candidate/UpdateCandidateDrawer.vue";
+import ChangeStateCandidate from "@/views/candidate/ChangeStateCandidate.vue";
+import Skeleton from "@/views/skeleton/Skeleton.vue";
+import CandidateInfo from "@/views/candidate/CandidateInfo.vue";
+import CandidateAccept from "@/views/candidate/CandidateAccept.vue";
+import { useAppAbility } from "@/plugins/casl/useAppAbility";
+import { transformPhoneNumber } from "@/helpers";
 
 const { can } = useAppAbility();
-const searchQuery = ref('');
-const finalSearch = ref('');
+const searchQuery = ref("");
+const finalSearch = ref("");
 const rowPerPage = ref(10);
 const currentPage = ref(1);
 const totalPage = ref(1);
@@ -26,12 +26,12 @@ const selectedGender = ref();
 const states_list = ref([]);
 const gender_list = ref([
   {
-    name_ru: 'Мужчина',
-    slug: 'man',
+    name_ru: "Мужчина",
+    slug: "man",
   },
   {
-    name_ru: 'Женщина',
-    slug: 'woman',
+    name_ru: "Женщина",
+    slug: "woman",
   },
 ]);
 
@@ -43,38 +43,39 @@ const filtersChanged = ref(false);
 const fetchData = async (force = false) => {
   if (
     !force &&
-    (isFetching.value || (currentPage.value === lastFetchedPage.value && !filtersChanged.value))
+    (isFetching.value ||
+      (currentPage.value === lastFetchedPage.value && !filtersChanged.value))
   ) {
     return; // Если запрос уже выполняется или страница не изменилась и фильтры не изменялись
   }
 
   isFetching.value = true;
-  let g = '';
-  let state = '';
+  let g = "";
+  let state = "";
 
   if (selectedGender.value) {
-    g = '&gender=' + selectedGender.value;
+    g = "&gender=" + selectedGender.value;
   }
 
   if (selectedState.value) {
-    state = '&state=' + selectedState.value;
+    state = "&state=" + selectedState.value;
   }
 
   try {
     const candidates_r = await axios.get(
-      `/candidates?page=${currentPage.value}${g}${state}&search=${finalSearch.value}`,
+      `/candidates?page=${currentPage.value}${g}${state}&search=${finalSearch.value}`
     );
 
-    candidates.value = candidates_r.data['candidates'];
+    candidates.value = candidates_r.data["candidates"];
     lastFetchedPage.value = currentPage.value;
-    currentPage.value = candidates_r.data['meta']['current_page'];
-    totalCandidates.value = candidates_r.data['meta']['total'];
-    totalPage.value = candidates_r.data['meta']['last_page'];
-    rowPerPage.value = candidates_r.data['meta']['per_page'];
+    currentPage.value = candidates_r.data["meta"]["current_page"];
+    totalCandidates.value = candidates_r.data["meta"]["total"];
+    totalPage.value = candidates_r.data["meta"]["last_page"];
+    rowPerPage.value = candidates_r.data["meta"]["per_page"];
 
     filtersChanged.value = false; // Сбрасываем флаг изменений фильтров после загрузки
   } catch (error) {
-    console.error('Ошибка загрузки кандидатов:', error);
+    console.error("Ошибка загрузки кандидатов:", error);
   } finally {
     isFetching.value = false;
   }
@@ -99,7 +100,7 @@ const searchElements = () => {
 
 watch(searchQuery, (newVal) => {
   if (!newVal) {
-    finalSearch.value = '';
+    finalSearch.value = "";
     currentPage.value = 1;
     fetchData(true);
   }
@@ -108,9 +109,11 @@ watch(searchQuery, (newVal) => {
 const fetchStates = async () => {
   try {
     const states_r = await axios.get(`/states`);
-    states_list.value = states_r.data.states.filter((el) => el.table === 'candidates');
+    states_list.value = states_r.data.states.filter(
+      (el) => el.table === "candidates"
+    );
   } catch (error) {
-    console.error('Ошибка :', error);
+    console.error("Ошибка :", error);
   }
 };
 
@@ -122,15 +125,15 @@ onMounted(() => {
 const resolveUserRoleVariant = (state) => {
   const roleLowerCase = state.toLowerCase();
   const roleMap = {
-    new: { color: 'primary', icon: 'bx-user' },
-    cancel: { color: 'warning', icon: 'bx-cog' },
-    archive: { color: 'secondary', icon: 'bx-cog' },
-    success: { color: 'success', icon: 'bx-doughnut-chart' },
-    invite: { color: 'info', icon: 'bx-pencil' },
-    block: { color: 'error', icon: 'bx-laptop' },
+    new: { color: "primary", icon: "bx-user" },
+    cancel: { color: "warning", icon: "bx-cog" },
+    archive: { color: "secondary", icon: "bx-cog" },
+    success: { color: "success", icon: "bx-doughnut-chart" },
+    invite: { color: "info", icon: "bx-pencil" },
+    block: { color: "error", icon: "bx-laptop" },
   };
 
-  return roleMap[roleLowerCase] || { color: 'primary', icon: 'bx-user' };
+  return roleMap[roleLowerCase] || { color: "primary", icon: "bx-user" };
 };
 
 const isAddNewCandidateDrawerVisible = ref(false);
@@ -153,8 +156,11 @@ watchEffect(() => {
 
 // 👉 Computing pagination data
 const paginationData = computed(() => {
-  const firstIndex = candidates.value.length ? (currentPage.value - 1) * rowPerPage.value + 1 : 0;
-  const lastIndex = candidates.value.length + (currentPage.value - 1) * rowPerPage.value;
+  const firstIndex = candidates.value.length
+    ? (currentPage.value - 1) * rowPerPage.value + 1
+    : 0;
+  const lastIndex =
+    candidates.value.length + (currentPage.value - 1) * rowPerPage.value;
 
   return `${firstIndex}-${lastIndex} of ${totalCandidates.value}`;
 });
@@ -219,7 +225,9 @@ const handleCandidateOpen = (id) => {
                 class="me-6"
               />
               <Can I="add" a="Candidate">
-                <VBtn @click="isAddNewCandidateDrawerVisible = true"> Добавить кандидата </VBtn>
+                <VBtn @click="isAddNewCandidateDrawerVisible = true">
+                  Добавить кандидата
+                </VBtn>
               </Can>
             </VCol>
 
@@ -239,12 +247,13 @@ const handleCandidateOpen = (id) => {
                 <th>СТАТУС</th>
                 <th
                   v-if="
-                    (can('update', 'Role') || can('change', 'Candidatestate')) &&
+                    (can('update', 'Role') ||
+                      can('change', 'Candidatestate')) &&
                     !candidates?.every(
                       (e) =>
                         e.state?.slug === 'success' ||
                         e.state?.slug === 'block' ||
-                        e.state?.slug === 'cancel',
+                        e.state?.slug === 'cancel'
                     )
                   "
                 >
@@ -265,7 +274,15 @@ const handleCandidateOpen = (id) => {
                   {{ candidate.full_name }}
                 </td>
                 <td>{{ candidate.age }}</td>
-                <td>{{ candidate.address }}</td>
+                <td class="truncate-address">
+                  {{ candidate.address
+                  }}<VTooltip
+                    activator="parent"
+                    location="bottom"
+                    open-delay="200"
+                    ><span style="font-size: 16px !important;">{{ candidate.address }}</span></VTooltip
+                  >
+                </td>
                 <td>{{ transformPhoneNumber(candidate.phone_number) }}</td>
                 <td>
                   <VChip
@@ -277,7 +294,10 @@ const handleCandidateOpen = (id) => {
                     {{ candidate.state.name_ru }}
                   </VChip>
                 </td>
-                <td class="text-center" :style="{ width: '80px', zIndex: '10' }">
+                <td
+                  class="text-center"
+                  :style="{ width: '80px', zIndex: '10' }"
+                >
                   <Can I="update" a="Role">
                     <VIcon
                       @click="
@@ -328,7 +348,9 @@ const handleCandidateOpen = (id) => {
 
             <tfoot v-show="!isFetching && !candidates.length">
               <tr>
-                <td colspan="7" class="text-center text-body-1">Нет доступных данных</td>
+                <td colspan="7" class="text-center text-body-1">
+                  Нет доступных данных
+                </td>
               </tr>
             </tfoot>
           </VTable>
@@ -370,12 +392,15 @@ const handleCandidateOpen = (id) => {
   </section>
 </template>
 
-<style lang="scss">
+<style lang="scss" >
 .app-user-search-filter {
   inline-size: 385px;
 }
 
-.text-capitalize {
-  text-transform: capitalize;
+.truncate-address {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px; /* This width determines truncation */
 }
 </style>
