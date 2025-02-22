@@ -347,62 +347,19 @@ const createCandidatePdf = async (photo_url) => {
 
                 <VListItem>
                   <VListItemTitle>
+                    <span>Адрес: </span>
+                    <span>{{ itemData.address }}</span>
+                  </VListItemTitle>
+                </VListItem>
+
+                <VListItem>
+                  <VListItemTitle>
                     <span>Номер телефона: </span>
                     <span>{{
                       transformPhoneNumber(itemData.phone_number)
                     }}</span>
                   </VListItemTitle>
                 </VListItem>
-
-                <!-- <VListItem>
-                  <VListItemTitle>
-                    <span>Языки: </span>
-                    <span
-                      
-                      >{{ languages_label }}</span
-                    >
-                  </VListItemTitle>
-                </VListItem>
-
-                 <VListItem>
-                  <VListItemTitle>
-                    <span>Add source: </span>
-                    <span
-                      
-                      >{{ itemData.add_source }}</span
-                    >
-                  </VListItemTitle>
-                </VListItem>
-
-                <VListItem>
-                  <VListItemTitle>
-                    <span>Last works: </span>
-                    <span
-                      
-                      >{{ itemData.last_work }}</span
-                    >
-                  </VListItemTitle>
-                </VListItem>
-
-                <VListItem>
-                  <VListItemTitle>
-                    <span>Marital state: </span>
-                    <span
-                      
-                      >{{ itemData.marital_state }}</span
-                    >
-                  </VListItemTitle>
-                </VListItem>
-
-                <VListItem>
-                  <VListItemTitle>
-                    <span>University: </span>
-                    <span
-                      
-                      >{{ itemData.university_place }}</span
-                    >
-                  </VListItemTitle>
-                </VListItem> -->
               </VRow>
             </VCol>
             <VCol cols="6">
